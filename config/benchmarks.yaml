@@ -1,0 +1,27 @@
+# Weekly performance benchmarks. Targets rise as accounts age (weeks since launch_date).
+# An account "underperforms" when it misses at least `account_misses_to_flag` targets in a week.
+
+phases:
+  - until_week: 4
+    reel_median_views: 150
+    carousel_median_views: 20
+    followers_gained: 15
+    save_share_rate: 0.01      # (saves + shares) / reach
+    reel_skip_rate_max: 65     # % of viewers who swipe away in the first 3 seconds
+  - until_week: 8
+    reel_median_views: 400
+    carousel_median_views: 60
+    followers_gained: 50
+    save_share_rate: 0.015
+    reel_skip_rate_max: 55
+  - until_week: 9999
+    reel_median_views: 1000
+    carousel_median_views: 150
+    followers_gained: 150
+    save_share_rate: 0.02
+    reel_skip_rate_max: 50
+
+account_misses_to_flag: 2       # targets missed in a week to count as underperforming
+rework_when_accounts_flagged: 3 # suggest a strategy rework when this many accounts underperform
+rework_when_views_drop: 0.20    # ...or when median views across accounts fall this much week over week
+sample_posts: 3                 # sample posts to write and send with suggestions

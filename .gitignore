@@ -1,0 +1,13 @@
+.env
+.venv/
+__pycache__/
+*.pyc
+output/
+.DS_Store
+
+# raw drop folders (processed copies live in assets/library)
+assets/backgrounds/
+assets/music/
+
+# Licensed media lives in its own private repo (naman272/beesz-content-media), checked out here
+media/

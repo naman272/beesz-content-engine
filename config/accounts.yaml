@@ -1,0 +1,93 @@
+# One entry per Instagram account. Every account covers every topic;
+# accounts differ by look, voice, format mix and posting times.
+
+topic_mix:            # share of each week's posts per account (feedback loop adjusts later)
+  fundraising: 0.2
+  starting_up: 0.2
+  finance: 0.2
+  tools_productivity: 0.2
+  growth_sales: 0.2
+
+timezone: Asia/Kolkata   # post_times below are in this timezone
+
+posts_per_day: 6
+launch_date: 2026-10-18  # first posting day; new accounts ramp up to protect them
+ramp: [2, 4]             # posts/day in week 1 and week 2 after launch, then posts_per_day
+
+# content_mix kinds: evergreen (AI advice), reddit_qa (real founder questions), breakdown (real companies),
+# india_admin (Indian schemes/compliance guides). Sources live in config/sources.yaml.
+
+# Formats the engine can render today. Others in format_mix wait until they're built.
+ready_formats: [carousel, reaction, chat, myth_fact, checklist, animated]
+format_switch_date: 2026-11-04   # slots on/after this date use format_mix_next (end of the hook test)
+
+accounts:
+  - id: acc1
+    handle: founder.world1
+    persona: The Blunt Operator
+    voice: >-
+      Short, direct, zero fluff. Calls out common founder mistakes.
+      Imperative sentences ("Stop doing X. Do Y."). No emojis except one per caption max.
+    colors: {bg: "#0A0A0A", text: "#FFFFFF", accent: "#FFD60A"}
+    fonts: {heading: "Archivo Black", body: "Inter"}
+    background_style: photo   # photo | illustration | any
+    format_mix: {reaction: 0.85, carousel: 0.15}
+    format_mix_next: {reaction: 0.25, chat: 0.25, myth_fact: 0.15, checklist: 0.1, animated: 0.1, carousel: 0.15}   # from format_switch_date
+    content_mix: {evergreen: 0.4, reddit_qa: 0.4, breakdown: 0.2}
+    post_times: ["07:10", "09:40", "12:20", "15:05", "18:30", "21:15"]
+
+  - id: acc2
+    handle: founder.space1
+    persona: The Calm Mentor
+    voice: >-
+      Warm, patient, older-sibling advice. Explains the why behind each step.
+      Plain language, reassuring tone, ends with one practical next step.
+    colors: {bg: "#F5F0E6", text: "#1F3A2E", accent: "#C8763A"}
+    fonts: {heading: "Fraunces", body: "Inter"}
+    background_style: illustration   # photo | illustration | any
+    format_mix: {reaction: 0.85, carousel: 0.15}
+    format_mix_next: {reaction: 0.2, checklist: 0.25, chat: 0.2, myth_fact: 0.1, animated: 0.1, carousel: 0.15}   # from format_switch_date
+    content_mix: {evergreen: 0.2, reddit_qa: 0.4, india_admin: 0.4}
+    post_times: ["07:45", "10:15", "13:00", "16:10", "19:05", "21:50"]
+
+  - id: acc3
+    handle: founderspace1
+    persona: The Data Nerd
+    voice: >-
+      Numbers-first and framework-driven. Leads with a figure or a formula,
+      then breaks it down. Precise, no hype. Only uses numbers from provided sources.
+    colors: {bg: "#0B1F3A", text: "#E8F1FF", accent: "#4CC9F0"}
+    fonts: {heading: "Space Grotesk", body: "JetBrains Mono"}
+    background_style: photo   # photo | illustration | any
+    format_mix: {reaction: 0.85, carousel: 0.15}
+    format_mix_next: {reaction: 0.2, myth_fact: 0.25, checklist: 0.15, chat: 0.15, animated: 0.1, carousel: 0.15}   # from format_switch_date
+    content_mix: {evergreen: 0.3, reddit_qa: 0.2, india_admin: 0.3, breakdown: 0.2}   # + weekly funding roundup
+    post_times: ["08:05", "10:50", "13:35", "16:40", "19:40", "22:20"]
+
+  - id: acc4
+    handle: foundr.world
+    persona: The Hype Builder
+    voice: >-
+      Energetic, Gen-Z founder energy. Tools, hacks, shortcuts.
+      Punchy hooks, fast pacing, "this is your sign to..." style.
+    colors: {bg_gradient: ["#7B2FF7", "#F107A3"], text: "#FFFFFF", accent: "#00F5D4"}
+    fonts: {heading: "Montserrat", body: "Poppins"}
+    background_style: illustration   # photo | illustration | any
+    format_mix: {reaction: 0.85, carousel: 0.15}
+    format_mix_next: {reaction: 0.3, chat: 0.2, animated: 0.15, myth_fact: 0.1, checklist: 0.1, carousel: 0.15}   # from format_switch_date
+    content_mix: {evergreen: 0.4, reddit_qa: 0.6}
+    post_times: ["07:25", "10:00", "12:45", "15:30", "18:50", "21:35"]
+
+  - id: acc5
+    handle: foundr_world
+    persona: The Storyteller
+    voice: >-
+      Real company stories with a lesson, always from provided sources. Opens with a
+      tension moment, ends with the lesson. Editorial tone. Never invents people or companies.
+    colors: {bg: "#FAF7F2", text: "#1A1A1A", accent: "#E63946"}
+    fonts: {heading: "DM Serif Display", body: "Inter"}
+    background_style: photo   # photo | illustration | any
+    format_mix: {reaction: 0.85, carousel: 0.15}
+    format_mix_next: {reaction: 0.3, myth_fact: 0.2, chat: 0.15, animated: 0.1, checklist: 0.1, carousel: 0.15}   # from format_switch_date
+    content_mix: {breakdown: 0.7, reddit_qa: 0.3}   # real stories only
+    post_times: ["08:20", "11:05", "14:10", "17:00", "20:00", "22:40"]

@@ -1,0 +1,38 @@
+# Background tagging. Files are referenced by their name in media/library/backgrounds/<category>/.
+# Any file not listed under "illustration" is treated as a photo.
+
+exclude:
+  - roses-street-ai-generated-8520972-1920.jpg   # dark distorted portrait
+  - waldekbk-character-10449217-1920.jpg         # top-hat money caricature
+
+illustration:
+  - hoggyart-pattern-8798134-1920.jpg
+  - kollsd-background-6804433-1920.jpg
+  - macey11-retro-10276415-1920.jpg
+  - mohamed-hassan-abstract-10363105-1920.jpg
+  - regencygirl123-sunrise-6587391-1920.jpg
+  - yayangart-shape-8401083-1920.jpg
+  - creativecanvasdesign-brazil-10104348-1920.jpg
+  - hardae-building-8320842-1920.jpg
+  - mohamed-hassan-village-9779463-1920.jpg
+  - rohan-k-draws-character-9038820-1920.jpg
+  - roszie-blackout-7492849-1920.jpg
+  - maarijaulakh-study-7332172-1920.jpg
+  - mohamed-hassan-education-9629691-1920.jpg
+  - ptra-laptop-3214756-1920.jpg
+  - regencygirl123-laptop-7691012-1920.jpg
+  - sara-torda-laptop-2298286-1920.jpg
+  - sharoe-man-8080524-1920.jpg
+  - ylanite-nietjuhart-laptop-7723139-1920.jpg
+  - flutie8211-piggy-bank-9070156-1920.jpg
+  - geralt-apple-589640-1920.jpg
+  - geralt-time-10373937-1920.jpg
+  - janjf93-coins-3344603-1920.jpg
+  - megan-rexazin-conde-bitcoin-4851388-1920.jpg
+  - mohamed-hassan-woman-10475306-1920.jpg
+  - alexmgeli-computer-7498415-1920.jpg
+  - flutie8211-presentation-10464589-1920.jpg
+  - geralt-business-success-10510459-1920.jpg
+  - graphicmama-team-meeting-1453895-1920.jpg
+  - mohamed-hassan-man-8106958-1920.jpg
+  - t0ngo-man-7267949-1920.jpg

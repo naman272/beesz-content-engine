@@ -1,0 +1,149 @@
+# Real-world sources for post types that must not be invented.
+
+# 1. Founder questions: top posts of the week from these subreddits (RSS).
+reddit:
+  subreddits: [smallbusiness, SideProject, AI_Agents, ChatGPT, automation, ProductivityApps, nocode,
+               Entrepreneur, startups, indiehackers, indianstartups, ArtificialInteligence, productivity,
+               EntrepreneurRideAlong, Startup_Ideas, growmybusiness, micro_saas, StartUpIndia]
+  min_score: 7          # 1-10: genuine, relatable founder question we can answer well
+  min_chars: 200        # question + body text needed
+
+# 3. Real company breakdowns: recent stories from the news feeds first, then these companies (Wikipedia).
+breakdowns:
+  min_chars: 2500
+  reuse_after_days: 90
+  companies:
+    - {name: Zerodha, url: "https://en.wikipedia.org/wiki/Zerodha"}
+    - {name: Zomato, url: "https://en.wikipedia.org/wiki/Zomato"}
+    - {name: Flipkart, url: "https://en.wikipedia.org/wiki/Flipkart"}
+    - {name: Zoho, url: "https://en.wikipedia.org/wiki/Zoho_Corporation"}
+    - {name: Freshworks, url: "https://en.wikipedia.org/wiki/Freshworks"}
+    - {name: Nykaa, url: "https://en.wikipedia.org/wiki/Nykaa"}
+    - {name: Lenskart, url: "https://en.wikipedia.org/wiki/Lenskart"}
+    - {name: PhysicsWallah, url: "https://en.wikipedia.org/wiki/Physics_Wallah"}
+    - {name: Meesho, url: "https://en.wikipedia.org/wiki/Meesho"}
+    - {name: Zepto, url: "https://en.wikipedia.org/wiki/Zepto_(company)"}
+    - {name: Postman, url: "https://en.wikipedia.org/wiki/Postman_(software)"}
+    - {name: BrowserStack, url: "https://en.wikipedia.org/wiki/BrowserStack"}
+    - {name: CRED, url: "https://en.wikipedia.org/wiki/Cred_(company)"}
+    - {name: Swiggy, url: "https://en.wikipedia.org/wiki/Swiggy"}
+    - {name: Dunzo, url: "https://en.wikipedia.org/wiki/Dunzo"}
+    - {name: Byju's, url: "https://en.wikipedia.org/wiki/Byju%27s"}
+    - {name: Airbnb, url: "https://en.wikipedia.org/wiki/Airbnb"}
+    - {name: Stripe, url: "https://en.wikipedia.org/wiki/Stripe,_Inc."}
+    - {name: Slack, url: "https://en.wikipedia.org/wiki/Slack_(software)"}
+    - {name: Canva, url: "https://en.wikipedia.org/wiki/Canva"}
+    - {name: Notion, url: "https://en.wikipedia.org/wiki/Notion_(productivity_software)"}
+    - {name: Figma, url: "https://en.wikipedia.org/wiki/Figma"}
+    - {name: WhatsApp, url: "https://en.wikipedia.org/wiki/WhatsApp"}
+    - {name: Shopify, url: "https://en.wikipedia.org/wiki/Shopify"}
+    - {name: Mailchimp, url: "https://en.wikipedia.org/wiki/Mailchimp"}
+    - {name: Instagram, url: "https://en.wikipedia.org/wiki/Instagram"}
+    - {name: Quibi, url: "https://en.wikipedia.org/wiki/Quibi"}
+    - {name: WeWork, url: "https://en.wikipedia.org/wiki/WeWork"}
+
+# 4. Indian startup admin: each topic needs at least 1 readable source; figures must appear in a source.
+india_admin:
+  min_sources: 1
+  reuse_after_days: 45
+  topics:
+    - id: dpiit_recognition
+      title: DPIIT startup recognition (Startup India)
+      official: startupindia.gov.in
+      sources:
+        - https://myhq.in/blog/virtual-office/startup-india-dpiit-registration
+        - https://www.patronaccounting.com/blog/dpiit-startup-recognition-2026-guide
+        - https://en.wikipedia.org/wiki/Startup_India
+        - https://www.startupindia.gov.in/content/sih/en/government-schemes.html
+    - id: section_80iac
+      title: Section 80-IAC tax holiday for startups
+      official: startupindia.gov.in and incometaxindia.gov.in
+      sources:
+        - https://ssrana.in/articles/section-80-iac-of-the-income-tax-act-1961-a-comprehensive-guide-for-startups-in-india/
+        - https://www.setindiabiz.com/blog/section-80-iac-tax-exemption-startups-guide
+    - id: seed_fund_scheme
+      title: Startup India Seed Fund Scheme (SISFS)
+      official: seedfund.startupindia.gov.in
+      sources:
+        - https://www.bajajfinserv.in/startup-india-seed-fund-scheme
+        - https://www.godigit.com/government-schemes/startup-india-seed-fund-scheme-sisfs
+        - https://razorpay.com/rize/blogs/startup-india-seed-fund-scheme
+        - https://www.bankbazaar.com/government-schemes/startup-india-seed-fund-scheme.html
+    - id: pvt_vs_llp
+      title: Private limited company vs LLP for a startup
+      official: mca.gov.in
+      sources:
+        - https://www.kanakkupillai.com/learn/the-ultimate-comparison-between-private-limited-and-llp-in-india/
+        - https://setindiabiz.com/company-vs-llp-comparison
+    - id: angel_tax
+      title: Angel tax abolition and what it means for fundraising
+      official: incometaxindia.gov.in
+      sources:
+        - https://cleartax.in/s/angel-tax
+        - https://inc42.com/buzz/budget-2024-25-fm-nirmala-sitharaman-abolishes-angel-tax
+        - https://www.business-standard.com/amp/budget/news/budget-2024-abolishes-angel-tax-on-startups-for-all-classes-of-investors-124072300667_1.html
+    - id: annual_compliance
+      title: Annual compliance checklist for a private limited company
+      official: mca.gov.in
+      sources:
+        - https://www.kanakkupillai.com/learn/step-by-step-process-for-annual-compliance-filing-for-private-limited-companies/
+        - https://www.legalwiz.in/blog/step-by-step-process-for-filing-aoc-4-and-mgt-7
+        - https://www.aiaccountant.com/blog/what-is-annual-compliance-india
+    - id: esop_tax
+      title: ESOP taxation and the startup tax deferral
+      official: incometaxindia.gov.in
+      sources:
+        - https://ksandk.com/labour-employment/esop-taxation-in-india/
+        - https://equitylist.co/blog-post/perquisite-tax-deferral-startups
+        - https://inc42.com/features/will-budget-2025-finally-bring-startup-esop-tax-relief
+    - id: gst_registration
+      title: GST registration for startups
+      official: gst.gov.in
+      sources:
+        - https://cleartax.in/s/gst-registration
+        - https://en.wikipedia.org/wiki/Goods_and_Services_Tax_(India)
+
+    # Government grants and schemes (names found via startupgrantsindia.com, details from independent sources)
+    - id: birac_big
+      title: BIRAC Biotechnology Ignition Grant (BIG)
+      official: birac.nic.in
+      sources:
+        - https://www.casrai.org/guides/birac-big-biotechnology-ignition-grant
+        - https://www.startupgrantsindia.com/birac-biotechnology-ignition-grant-scheme-65
+        - https://indiascienceandtechnology.gov.in/funding-opportunities/startups/biotechnology-ignition-grant-scheme-big
+    - id: nidhi_prayas
+      title: NIDHI-PRAYAS prototype grant (DST)
+      official: nidhi.dst.gov.in
+      sources:
+        - https://casrai.org/guides/nidhi-prayas-prototype-grant-eligibility-application
+        - https://htic.iitm.ac.in/mti/nidhi-prayas/
+        - https://ahduni.edu.in/academics/schools-centres/venturestudio/programmes/funding-programmes/nidhi-prayas
+        - https://www.indiascienceandtechnology.gov.in/funding-opportunities/startups/nidhi-promoting-and-accelerating-young-and-aspiring-innovators
+    - id: meity_samridh
+      title: MeitY SAMRIDH accelerator funding
+      official: msh.meity.gov.in
+      sources:
+        - https://razorpay.com/rize/blogs/samridh-programme
+        - https://iimuic.org/?p=8924
+        - https://abif.iitkgp.ac.in/programs/samridh
+    - id: drdo_tdf
+      title: DRDO Technology Development Fund (TDF) for defence tech startups
+      official: tdf.drdo.gov.in
+      sources:
+        - https://www.bajajfinserv.in/technology-development-fund-tdf-scheme
+        - https://pib.gov.in/PressReleasePage.aspx?PRID=1947699
+        - https://www.aviation-defence-universe.com/funding-under-technology-development-fund-scheme-of-drdo-enhanced-to-rs-50-crore-per-project-from-rs-10-crore
+    - id: cgss
+      title: Credit Guarantee Scheme for Startups (collateral-free loans)
+      official: startupindia.gov.in
+      sources:
+        - https://www.smfgindiacredit.com/knowledge-center/credit-guarantee-scheme-for-startups-cgss.aspx
+        - https://www.bankbazaar.com/personal-loan/credit-guarantee-scheme-for-startups.html
+        - https://www.business-standard.com/amp/article/economy-policy/govt-to-provide-collateral-free-loans-to-start-ups-under-cgss-framework-122100701048_1.html
+        - https://en.vikaspedia.in/viewcontent/social-welfare/entrepreneurship/startup-india-1/credit-guarantee-scheme-for-startups?lgn=en
+
+# 5. Weekly funding roundup from the news feeds' headlines (posted once a week).
+funding_roundup:
+  account: acc3
+  weekday: 0            # Monday
+  min_rounds: 4

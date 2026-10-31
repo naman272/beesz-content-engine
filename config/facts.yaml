@@ -1,0 +1,12 @@
+# Fact sheet: the ONLY source the AI may use for specific names (investors, firms,
+# accelerators, companies, people) and specific numbers (percentages, amounts, stats).
+# Add verified entries here; the AI cites them by id. Empty list = general advice only.
+#
+# Example entry:
+#  - id: yc-standard-deal
+#    category: fundraising            # fundraising | starting_up | finance | tools_productivity | growth_sales
+#    fact: "Y Combinator's standard deal is $500K: $125K for 7% plus a $375K uncapped SAFE."
+#    source: https://www.ycombinator.com/deal
+#    checked: 2026-10-15
+
+facts: []

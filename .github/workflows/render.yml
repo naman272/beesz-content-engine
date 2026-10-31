@@ -1,0 +1,59 @@
+name: Render
+
+on:
+  schedule:
+    - cron: "20 */4 * * *"
+  workflow_dispatch:
+    inputs:
+      hours:
+        description: Render posts due within this many hours
+        default: "7"
+
+concurrency: render
+
+env:
+  AI_PROVIDER: ${{ vars.AI_PROVIDER || 'anthropic' }}
+  AI_MODEL: ${{ vars.AI_MODEL || 'claude-opus-5-5' }}
+  AI_MODEL_FAST: ${{ vars.AI_MODEL_FAST || 'claude-haiku-5-5' }}
+  ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+  OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+  META_APP_ID: ${{ secrets.META_APP_ID }}
+  META_APP_SECRET: ${{ secrets.META_APP_SECRET }}
+  IG_TOKEN_ACC1: ${{ secrets.IG_TOKEN_ACC1 }}
+  IG_TOKEN_ACC2: ${{ secrets.IG_TOKEN_ACC2 }}
+  IG_TOKEN_ACC3: ${{ secrets.IG_TOKEN_ACC3 }}
+  IG_TOKEN_ACC4: ${{ secrets.IG_TOKEN_ACC4 }}
+  IG_TOKEN_ACC5: ${{ secrets.IG_TOKEN_ACC5 }}
+  TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+  TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+  SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+  SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+  R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+  R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+  R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+  R2_BUCKET: ${{ secrets.R2_BUCKET }}
+  R2_PUBLIC_URL: ${{ secrets.R2_PUBLIC_URL }}
+  PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: naman272/beesz-content-media
+          ssh-key: ${{ secrets.MEDIA_DEPLOY_KEY }}
+          path: media
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: pip install -r requirements.txt
+      - run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+      - run: python -m playwright install --with-deps chromium
+      - run: python -m scripts.render_due --hours ${{ inputs.hours || '7' }}

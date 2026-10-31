@@ -1,0 +1,40 @@
+# Instagram profile setup per account (set by hand in the app: Edit profile).
+# Name: max 30 chars, searchable on Instagram, so it carries a keyword.
+# Bio: max 150 chars.
+
+profiles:
+  acc1:
+    name: "Founder World | Startup Truths"
+    bio: |-
+      Startup advice with zero fluff.
+      The mistakes to skip and the moves that work.
+      New posts daily. Save what helps 👇
+    monogram: FW
+  acc2:
+    name: "Founder Space | Startup Guide"
+    bio: |-
+      Calm, step-by-step guidance for first-time founders.
+      Funding, finance, first customers.
+      One useful idea a day 🌱
+    monogram: Fs
+  acc3:
+    name: "Startup Math | Founder Space"
+    bio: |-
+      The numbers behind startups, made simple.
+      Runway, burn, pricing, fundraising frameworks.
+      Formulas you can use today 📊
+    monogram: FS
+  acc4:
+    name: "Foundr World | Startup Hacks"
+    bio: |-
+      Tools, hacks and shortcuts for founders who ship.
+      Build faster. Spend less. Grow smarter.
+      New hack every day ⚡
+    monogram: FW
+  acc5:
+    name: "Foundr World | Founder Stories"
+    bio: |-
+      Short founder stories with the lesson inside.
+      What went wrong, what worked, what to copy.
+      A new story daily 📖
+    monogram: F

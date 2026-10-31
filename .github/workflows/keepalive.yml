@@ -1,0 +1,21 @@
+name: Keep alive
+
+# GitHub pauses scheduled workflows in public repos after 60 days without commits; re-enable them weekly.
+on:
+  schedule:
+    - cron: "0 3 * * 1"
+  workflow_dispatch:
+
+permissions:
+  actions: write
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          for wf in hourly.yml render.yml plan-week.yml nightly.yml weekly-review.yml; do
+            gh workflow enable "$wf" --repo "$GITHUB_REPOSITORY"
+          done
+        env:
+          GH_TOKEN: ${{ github.token }}

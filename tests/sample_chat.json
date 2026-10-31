@@ -1,0 +1,44 @@
+{
+  "topic": "fundraising",
+  "hook_type": "mistake",
+  "hook": "wait investors don't want the deck in the first email??",
+  "other_role": "Angel Investor",
+  "messages": [
+    {
+      "side": "you",
+      "text": "Sent my full deck to a bunch of investors. Zero replies. What am I doing wrong?"
+    },
+    {
+      "side": "them",
+      "text": "You led with the deck. Most of us read the email first and decide fast."
+    },
+    {
+      "side": "you",
+      "text": "So what do I send instead?"
+    },
+    {
+      "side": "them",
+      "text": "5 lines. What you do. Who pays. Traction. Why you. The ask."
+    },
+    {
+      "side": "you",
+      "text": "No deck at all?"
+    },
+    {
+      "side": "them",
+      "text": "Keep a short teaser deck ready. Send it when they reply asking for more."
+    }
+  ],
+  "music_mood": "dramatic",
+  "cta": "Save this before your next investor email.",
+  "caption": "Stop attaching a long deck to your first cold email. Investors get flooded with them. The email is the pitch. The deck comes later.\n\nWrite 5 lines:\n1. What you do, in one sentence.\n2. Who pays for it.\n3. Your traction or proof so far.\n4. Why your team wins.\n5. The ask: a short call.\n\nIf they reply, send a short teaser deck. Save the full deck for the meeting.\n\nNo revenue yet? Show real signals: waitlist signups, pilot users, customer interviews. Something they can believe.\n\nWhat's the first line of your investor email right now? Drop it below.",
+  "hashtags": [
+    "fundraising",
+    "startupindia",
+    "pitchdeck",
+    "founders",
+    "angelinvestor",
+    "coldemail"
+  ],
+  "facts_used": []
+}

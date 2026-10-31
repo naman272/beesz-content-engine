@@ -1,0 +1,39 @@
+# Breaking-news posts: checked every hour, on top of the normal daily quota.
+
+feeds:
+  - {name: TechCrunch, url: "https://techcrunch.com/category/startups/feed/"}
+  - {name: TechCrunch, url: "https://techcrunch.com/category/venture/feed/"}
+  - {name: Crunchbase News, url: "https://news.crunchbase.com/feed/"}
+  - {name: Sifted, url: "https://sifted.eu/feed"}
+  - {name: Inc42, url: "https://inc42.com/feed/"}
+  - {name: YourStory, url: "https://yourstory.com/feed"}
+  - {name: The Economic Times, url: "https://economictimes.indiatimes.com/tech/startups/rssfeeds/78570540.cms"}
+  - {name: Y Combinator, url: "https://www.ycombinator.com/blog/rss/"}
+  - {name: Hacker News, url: "https://hnrss.org/frontpage?points=300"}
+  - {name: The Verge, url: "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml"}
+
+max_age_hours: 12          # ignore stories older than this
+min_score: 8               # 1-10 filter score needed to post
+max_per_day: 5             # news posts per day across all accounts
+max_per_account_per_day: 1
+min_article_chars: 800     # need enough article text to ground every fact
+quiet_hours: ["00:00", "07:00"]   # local time; news found overnight posts at 07:00
+
+# What the filter accepts and rejects. It scores each story 1-10 and must also name
+# a concrete takeaway for early-stage founders.
+accept: |
+  - Funding news that reveals a trend or lesson (new fund for early-stage, pre-seed/seed market shifts,
+    an unusual round structure), not routine "X raised Y" with nothing to learn
+  - New accelerator, grant or startup programs, especially with deadlines founders can act on
+  - Government policy, tax, compliance or visa changes that affect startups
+  - Major AI/tool launches founders can use right away
+  - Notable startup shutdowns, pivots or turnarounds with a clear lesson
+  - Acquisitions or market moves that signal where opportunities are opening
+  - Fundraising market data (valuations, round sizes) from credible sources
+reject: |
+  - Stock price moves, public-company earnings and IPO trading (unless there's a direct startup lesson)
+  - Politics, crime, lawsuits and gossip, celebrity news
+  - Layoffs or tragedies framed around human loss (sensitive; skip)
+  - Sponsored posts, press releases, opinion pieces, book lists and listicles
+  - Narrow technical/research posts most founders can't act on
+  - Anything that needs facts the article doesn't contain
