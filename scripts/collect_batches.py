@@ -11,12 +11,8 @@ from engine.config import env, load_accounts
 
 
 def rewrite(client, model, account, group, i, problems, avoid) -> dict | None:
-    notes = "; ".join(problems)
-    if group.get("kind", "evergreen") == "evergreen":
-        params = content.request_params(model, account, group["topic"], 1, fmt=group["format"],
-                                        avoid_hooks=avoid, angles=[group["angles"][i]], fix_notes=notes)
-    else:
-        params = content.sourced_params(model, account, group["format"], group["doc"], fix_notes=notes)
+    params = content.plan_entry_params(model, account, group, avoid, planner.proven_hooks(),
+                                       fix_notes="; ".join(problems), index=i)
     with client.messages.stream(**params) as stream:
         message = stream.get_final_message()
     posts = content.parse_posts(message)

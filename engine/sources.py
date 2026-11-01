@@ -47,6 +47,12 @@ def _used_source_urls(days: int) -> set[str]:
     return {r["source_url"] for r in rows}
 
 
+def _previous_hooks(source_url: str) -> list[str]:
+    """Hooks we already posted from this source, so a repeat takes a different angle."""
+    return [r["hook"] for r in db.select("posts", {"source_url": f"eq.{source_url}", "status": "neq.dropped"},
+                                         columns="hook", limit=10)]
+
+
 def _fast_json(prompt: str, schema: dict, attempts: int = 3) -> dict:
     client = anthropic.Anthropic(api_key=env("ANTHROPIC_API_KEY"))
     for attempt in range(attempts):
@@ -173,7 +179,8 @@ def breakdowns(count: int) -> list[dict]:
         text = fetch_text(c["url"])
         if len(text) >= cfg["min_chars"]:
             docs.append({"kind": "breakdown", "label": c["name"], "source_name": "Wikipedia",
-                         "source_url": c["url"], "urls": [c["url"]], "texts": [text]})
+                         "source_url": c["url"], "urls": [c["url"]], "texts": [text],
+                         "previous_hooks": _previous_hooks(c["url"])})
     return docs
 
 
@@ -197,7 +204,7 @@ def india_topics(count: int) -> list[dict]:
                 urls.append(url)
         if len(texts) >= cfg["min_sources"]:
             docs.append({"kind": "india_admin", "label": topic["title"], "official": topic["official"],
-                         "source_url": marker, "urls": urls, "texts": texts})
+                         "source_url": marker, "urls": urls, "texts": texts, "previous_hooks": _previous_hooks(marker)})
         else:
             print(f"india topic {topic['id']}: only {len(texts)} readable sources, skipped")
     return docs

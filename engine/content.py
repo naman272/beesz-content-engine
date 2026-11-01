@@ -222,7 +222,7 @@ def post_schema(fmt: str) -> dict:
 
 def request_params(model: str, account: dict, topic: str, count: int, fmt: str = "carousel",
                    avoid_hooks: list[str] = (), proven_hooks: list[str] = (),
-                   angles: list[str] = (), fix_notes: str = "") -> dict:
+                   angles: list[str] = (), fix_notes: str = "", explore_away_from: list[str] = ()) -> dict:
     """Messages API params for one (account, topic, format) request. Shared system rules come first so they cache."""
     label = FORMAT_LABELS[fmt] + "(s)"
     if angles:
@@ -233,6 +233,11 @@ def request_params(model: str, account: dict, topic: str, count: int, fmt: str =
         task = (f"Write {count} {label} for this account on the topic '{topic}' "
                 f"({TOPICS[topic]}). Each one needs a different angle and, where possible, a different hook type.")
     task += f"\nSet topic to '{topic}' on every post."
+    if explore_away_from:
+        listed = "\n".join(f"- {h}" for h in explore_away_from)
+        task += ("\nEXPLORE: these posts are currently winning. Keep the same hook voice, but deliberately cover a "
+                 "DIFFERENT kind of insight than them (e.g. a framework, comparison, tool, how-to, myth, number or "
+                 f"behind-the-scenes, rather than another mistake callout):\n{listed}")
     if fix_notes:
         task += f"\nA previous attempt failed automatic checks: {fix_notes}. Avoid these problems."
     return {
@@ -290,10 +295,43 @@ def sourced_params(model: str, account: dict, fmt: str, doc: dict, fix_notes: st
     task = f"Write 1 {label}. Pick the topic that fits best.\n" + SOURCED_GUIDES[doc["kind"]].format(
         source=source, label=doc.get("label", ""), sub=doc.get("sub", ""),
         source_name=doc.get("source_name", ""), official=doc.get("official", "the official portal"))
+    if doc.get("previous_hooks"):
+        task += ("\n\nWe already posted about this before. Take a clearly DIFFERENT angle and lesson than these:\n"
+                 + "\n".join(f"- {h}" for h in doc["previous_hooks"]))
     if fix_notes:
         task += f"\n\nA previous attempt failed automatic checks: {fix_notes}. Avoid these problems."
     params["messages"] = [{"role": "user", "content": task}]
     return params
+
+
+def winner_params(model: str, account: dict, fmt: str, count: int, winners: list[dict],
+                  avoid_hooks: list[str] = (), fix_notes: str = "") -> dict:
+    """Posts that reuse the PATTERN behind current winners on new topics (the 'exploit' share of the plan)."""
+    params = request_params(model, account, "starting_up", count, fmt=fmt, avoid_hooks=avoid_hooks)
+    listed = "\n".join(f"- \"{w['hook']}\" ({w.get('hook_type')}, {w.get('topic')}, {w.get('views')} views)" for w in winners)
+    task = (f"Write {count} {FORMAT_LABELS[fmt]}(s). These posts are our current winners:\n{listed}\n\n"
+            "Work out WHY they won (the kind of insight, the tension in the hook, how specific it is) and apply "
+            "that same pattern to NEW topics founders care about. Never reuse their topics or paraphrase their "
+            "hooks. Each post a different topic. Pick the topic field that fits each post.")
+    if fix_notes:
+        task += f"\nA previous attempt failed automatic checks: {fix_notes}. Avoid these problems."
+    params["messages"] = [{"role": "user", "content": task}]
+    return params
+
+
+def plan_entry_params(model: str, account: dict, g: dict, avoid: list[str], proven: list[str],
+                      fix_notes: str = "", index: int | None = None) -> dict:
+    """Request params for one weekly-plan entry (or one post of it, when rewriting after failed checks)."""
+    kind = g.get("kind", "evergreen")
+    if kind == "winner":
+        count = 1 if index is not None else len(g["slots"])
+        return winner_params(model, account, g["format"], count, g["winners"], avoid, fix_notes)
+    if kind == "evergreen":
+        angles = [g["angles"][index]] if index is not None else g["angles"]
+        # Advice posts outside the winner share explore other kinds of insight (40% exploit / 60% explore)
+        return request_params(model, account, g["topic"], len(angles), fmt=g["format"], avoid_hooks=avoid,
+                              angles=angles, fix_notes=fix_notes, explore_away_from=proven[:6])
+    return sourced_params(model, account, g["format"], g["doc"], fix_notes=fix_notes)
 
 
 def parse_posts(message) -> list[dict]:

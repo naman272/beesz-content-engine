@@ -19,10 +19,7 @@ def submit(cfg: dict, slots: dict[str, list[datetime]]) -> dict[str, int]:
     avoid, proven = planner.recent_hooks(), planner.proven_hooks()
 
     def params(g: dict) -> dict:
-        if g["kind"] == "evergreen":
-            return content.request_params(model, accounts[g["account"]], g["topic"], len(g["angles"]),
-                                          fmt=g["format"], avoid_hooks=avoid, proven_hooks=proven, angles=g["angles"])
-        return content.sourced_params(model, accounts[g["account"]], g["format"], g["doc"])
+        return content.plan_entry_params(model, accounts[g["account"]], g, avoid, proven)
 
     client = anthropic.Anthropic(api_key=env("ANTHROPIC_API_KEY"))
     batch = client.messages.batches.create(requests=[

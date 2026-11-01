@@ -11,7 +11,7 @@ reddit:
 # 3. Real company breakdowns: recent stories from the news feeds first, then these companies (Wikipedia).
 breakdowns:
   min_chars: 2500
-  reuse_after_days: 90
+  reuse_after_days: 30   # the same company can come back with a different lesson
   companies:
     - {name: Zerodha, url: "https://en.wikipedia.org/wiki/Zerodha"}
     - {name: Zomato, url: "https://en.wikipedia.org/wiki/Zomato"}
@@ -41,11 +41,46 @@ breakdowns:
     - {name: Instagram, url: "https://en.wikipedia.org/wiki/Instagram"}
     - {name: Quibi, url: "https://en.wikipedia.org/wiki/Quibi"}
     - {name: WeWork, url: "https://en.wikipedia.org/wiki/WeWork"}
+    - {name: Ola Cabs, url: "https://en.wikipedia.org/wiki/Ola_Cabs"}
+    - {name: Paytm, url: "https://en.wikipedia.org/wiki/Paytm"}
+    - {name: PhonePe, url: "https://en.wikipedia.org/wiki/PhonePe"}
+    - {name: Urban Company, url: "https://en.wikipedia.org/wiki/Urban_Company"}
+    - {name: OYO, url: "https://en.wikipedia.org/wiki/Oyo_Rooms"}
+    - {name: Unacademy, url: "https://en.wikipedia.org/wiki/Unacademy"}
+    - {name: Delhivery, url: "https://en.wikipedia.org/wiki/Delhivery"}
+    - {name: Cars24, url: "https://en.wikipedia.org/wiki/Cars24"}
+    - {name: BharatPe, url: "https://en.wikipedia.org/wiki/BharatPe"}
+    - {name: InMobi, url: "https://en.wikipedia.org/wiki/InMobi"}
+    - {name: Ather Energy, url: "https://en.wikipedia.org/wiki/Ather_Energy"}
+    - {name: Dream11, url: "https://en.wikipedia.org/wiki/Dream11"}
+    - {name: Rapido, url: "https://en.wikipedia.org/wiki/Rapido_(company)"}
+    - {name: Dropbox, url: "https://en.wikipedia.org/wiki/Dropbox"}
+    - {name: Pinterest, url: "https://en.wikipedia.org/wiki/Pinterest"}
+    - {name: Spotify, url: "https://en.wikipedia.org/wiki/Spotify"}
+    - {name: Zoom, url: "https://en.wikipedia.org/wiki/Zoom_Communications"}
+    - {name: Duolingo, url: "https://en.wikipedia.org/wiki/Duolingo"}
+    - {name: Atlassian, url: "https://en.wikipedia.org/wiki/Atlassian"}
+    - {name: HubSpot, url: "https://en.wikipedia.org/wiki/HubSpot"}
+    - {name: Basecamp (37signals), url: "https://en.wikipedia.org/wiki/37signals"}
+    - {name: Gumroad, url: "https://en.wikipedia.org/wiki/Gumroad"}
+    - {name: Theranos, url: "https://en.wikipedia.org/wiki/Theranos"}
+    - {name: Juicero, url: "https://en.wikipedia.org/wiki/Juicero"}
+    - {name: Webvan, url: "https://en.wikipedia.org/wiki/Webvan"}
+    - {name: Groupon, url: "https://en.wikipedia.org/wiki/Groupon"}
+    - {name: Snapchat, url: "https://en.wikipedia.org/wiki/Snap_Inc."}
+    - {name: Calendly, url: "https://en.wikipedia.org/wiki/Calendly"}
+    - {name: Zapier, url: "https://en.wikipedia.org/wiki/Zapier"}
+    - {name: GitHub, url: "https://en.wikipedia.org/wiki/GitHub"}
+    - {name: Warby Parker, url: "https://en.wikipedia.org/wiki/Warby_Parker"}
+    - {name: Dollar Shave Club, url: "https://en.wikipedia.org/wiki/Dollar_Shave_Club"}
+    - {name: Glossier, url: "https://en.wikipedia.org/wiki/Glossier"}
+    - {name: Twitch, url: "https://en.wikipedia.org/wiki/Twitch_(service)"}
+    - {name: Tinder, url: "https://en.wikipedia.org/wiki/Tinder_(app)"}
 
 # 4. Indian startup admin: each topic needs at least 1 readable source; figures must appear in a source.
 india_admin:
   min_sources: 1
-  reuse_after_days: 45
+  reuse_after_days: 14   # a scheme can be covered again from a new angle
   topics:
     - id: dpiit_recognition
       title: DPIIT startup recognition (Startup India)

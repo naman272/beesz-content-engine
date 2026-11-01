@@ -72,6 +72,10 @@ def find_winners(rows: list[dict]) -> list[dict]:
     for r in rows:
         by_account[r["post"]["account_id"]].append(r["views"] or 0)
     known = {h["post_id"] for h in db.select("hooks", {"source": "eq.winner"}, columns="post_id")}
+    # Keep winners' view counts current, so the weekly plan ranks patterns by today's numbers
+    for r in rows:
+        if r["post"]["id"] in known and r["views"]:
+            db.update("hooks", {"post_id": f"eq.{r['post']['id']}"}, {"views": r["views"]})
     winners = []
     for r in rows:
         p, views = r["post"], r["views"] or 0

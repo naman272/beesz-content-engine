@@ -77,9 +77,13 @@ def recent_hooks(days: int = 30, limit: int = 80) -> list[str]:
 
 
 def proven_hooks(limit: int = 12) -> list[str]:
-    rows = db.select("hooks", {"active": "is.true"}, columns="hook,views,source",
+    return [w["hook"] for w in winners(limit)]
+
+
+def winners(limit: int = 6) -> list[dict]:
+    """Top-performing hooks (winners and references), best first."""
+    return db.select("hooks", {"active": "is.true"}, columns="hook,hook_type,topic,format,views,source",
                      order="views.desc.nullslast", limit=limit)
-    return [r["hook"] for r in rows]
 
 
 def plan_angles(topic_counts: Counter, avoid: list[str]) -> dict[str, list[str]]:
@@ -119,6 +123,7 @@ KIND_FORMATS = {
     "india_admin": ("carousel", "reaction", "animated", "checklist"),
     "funding_roundup": ("carousel",),
     "news": ("carousel", "reaction", "animated"),
+    "winner": None,
 }
 
 
@@ -155,11 +160,15 @@ def build_week(cfg: dict, start: date, only_slots: dict[str, list[datetime]] | N
     tz = ZoneInfo(cfg["timezone"])
     roundup_cfg = sources.settings()["funding_roundup"]
 
+    top_winners = winners()
     planned = []  # [account_id, slot, format, topic, kind]
     for account in cfg["accounts"]:
         account_slots = slots(cfg, account, start) if only_slots is None else only_slots.get(account["id"], [])
         n = len(account_slots)
-        kinds = _allocate(account.get("content_mix") or {"evergreen": 1}, n) if n else []
+        # Exploit/explore: a fixed share of slots reuse the winning pattern, the rest follow the content mix
+        n_win = round(n * cfg.get("exploit_share", 0)) if n and top_winners else 0
+        kinds = ["winner"] * n_win + (_allocate(account.get("content_mix") or {"evergreen": 1}, n - n_win) if n else [])
+        random.shuffle(kinds)
         rows = [[account["id"], slot, fmt, topic, kind]
                 for slot, (fmt, topic), kind in zip(account_slots, assign(cfg, account, account_slots), kinds)]
         if account["id"] == roundup_cfg["account"] and rows:
@@ -187,6 +196,11 @@ def build_week(cfg: dict, start: date, only_slots: dict[str, list[datetime]] | N
         account_id, slot, fmt, topic, kind = r[:5]
         if kind == "evergreen":
             groups[(account_id, fmt, topic)].append(slot)
+        elif kind == "winner":
+            key = f"{account_id}__{fmt}__winner"
+            entry = plan.setdefault(key, {"account": account_id, "format": fmt, "kind": "winner", "slots": [],
+                                          "winners": top_winners})
+            entry["slots"].append(slot.isoformat())
         else:
             plan[f"{account_id}__{kind}__{i}"] = {"account": account_id, "format": fmt, "kind": kind,
                                                   "slots": [slot.isoformat()], "doc": r[5]}

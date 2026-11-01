@@ -42,11 +42,7 @@ def main() -> None:
     avoid, proven = planner.recent_hooks(), planner.proven_hooks()
     model = llm.model_for(fast=False)
     def params(g: dict) -> dict:
-        if g.get("kind", "evergreen") == "evergreen":
-            return content.request_params(model, accounts[g["account"]], g["topic"], len(g["angles"]),
-                                          fmt=g["format"], avoid_hooks=avoid, proven_hooks=proven,
-                                          angles=g["angles"])
-        return content.sourced_params(model, accounts[g["account"]], g["format"], g["doc"])
+        return content.plan_entry_params(model, accounts[g["account"]], g, avoid, proven)
 
     requests = [Request(custom_id=cid, params=MessageCreateParamsNonStreaming(**params(g)))
                 for cid, g in plan.items()]

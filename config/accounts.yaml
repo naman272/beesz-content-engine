@@ -11,6 +11,7 @@ topic_mix:            # share of each week's posts per account (feedback loop ad
 timezone: Asia/Kolkata   # post_times below are in this timezone
 
 posts_per_day: 6
+exploit_share: 0.4       # share of each account's posts that reuse the current winning pattern; the rest explore
 launch_date: 2026-10-18  # first posting day; new accounts ramp up to protect them
 ramp: [2, 4]             # posts/day in week 1 and week 2 after launch, then posts_per_day
 

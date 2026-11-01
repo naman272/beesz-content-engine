@@ -1,7 +1,7 @@
 """One-off: drops queued (not yet rendered) posts matching a filter and refills their slots with the current
 strategy (format mix, hooks, sources).
 
-Run: python -m scripts.replan_queue --carousels [--dry-run]
+Run: python -m scripts.replan_queue --carousels|--evergreen [--dry-run]
      python -m scripts.replan_queue --refill-dropped   # finish an interrupted run
 """
 import sys
@@ -27,6 +27,8 @@ def main() -> None:
         rows = db.select("posts", {"status": "eq.planned", "scheduled_at": f"gt.{after}"})
     if "--carousels" in sys.argv:
         rows = [r for r in rows if r["format"] == "carousel" and r["kind"] not in KEEP_KINDS]
+    if "--evergreen" in sys.argv:  # re-plan general advice posts with the current exploit/explore split
+        rows = [r for r in rows if r["kind"] == "evergreen"]
     print(f"{len(rows)} queued posts to re-plan")
     if "--dry-run" in sys.argv or not rows:
         return
@@ -38,7 +40,7 @@ def main() -> None:
     counts = refill.submit(cfg, slots)
     for r in rows:
         db.update("posts", {"id": f"eq.{r['id']}"}, {"error": DONE})
-    msg = (f"🔁 Re-planned {len(rows)} queued carousels as Reels-first with controversial hooks: "
+    msg = (f"🔁 Re-planned {len(rows)} queued posts with the current strategy: "
            + ", ".join(f"{k} {v}" for k, v in counts.items()))
     print(msg)
     telegram.send_message(msg)
