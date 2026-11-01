@@ -3,10 +3,8 @@ refresh Instagram tokens, clean old media.
 
 Run: python -m scripts.nightly
 """
-import tempfile
 from collections import defaultdict
 from datetime import datetime, timedelta, timezone
-from pathlib import Path
 from statistics import median
 
 
@@ -93,22 +91,7 @@ def send_winner(r: dict) -> None:
     p = r["post"]
     telegram.send_message(f"🏆 Winner on @{HANDLES[p['account_id']]}: {r['views']} views in {r['hours_live']:.0f}h\n"
                           f"\"{p['hook']}\" ({p['format']}, {p['hook_type']})\n{p['permalink']}\n"
-                          "Its hook pattern goes into next week's plan. Media below if you want to repost it.")
-    if not p.get("media_keys"):
-        return
-    try:
-        with tempfile.TemporaryDirectory() as tmp:
-            files = []
-            for key in p["media_keys"]:
-                path = Path(tmp) / Path(key).name
-                path.write_bytes(storage.download(key))
-                files.append(path)
-            if p["format"] == "carousel":
-                telegram.send_photos(files)
-            else:
-                telegram.send_video(files[0])
-    except Exception as e:
-        telegram.send_message(f"(Couldn't attach the media file: {e}. Use the link above.)"[:500])
+                          "Its hook pattern goes into next week's plan automatically.")
 
 
 def daily_report(rows: list[dict]) -> str:
