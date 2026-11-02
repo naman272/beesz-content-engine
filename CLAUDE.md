@@ -40,7 +40,9 @@ acc5 foundr_world (Storyteller, real company stories only). Profiles in `config/
 - **40% exploit / 60% explore** (`exploit_share`): 40% of slots reuse the current winning pattern on new
   topics (`kind: winner`), the rest explore other content. Don't let winners homogenize everything.
 - Formats: reaction (clips), carousel, and from 2026-11-04 (`format_switch_date`) 2D animated formats:
-  chat, myth_fact, checklist, animated (`engine/render/formats2d.py`, `animated.py`, mascot art in `mascot.py`).
+  chat, myth_fact, checklist, animated (`engine/render/formats2d.py`, `animated.py`, mascot art in `mascot.py`),
+  and explainer (narrated, free Kokoro voice at 1.2x, one voice per account; `engine/render/explainer.py`,
+  `engine/voice.py`, spec in `docs/explainer-format.md`), 15% of each account's mix.
 - Changes to content strategy go through the owner; a 1-week hook test ran 28 Oct - 3 Nov.
 
 ## Known gotchas

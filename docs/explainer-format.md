@@ -1,7 +1,7 @@
 # Explainer Reel format (voiceover + presenter + animated illustrations)
 
-Status: in progress (approved by the owner 2026-11-02). Free voice first (open-source TTS).
-Goes into the mix only after the owner approves a sample, and not before 2026-11-04 (end of the hook test).
+Status: live from 2026-11-04 (owner approved the sample). Free Kokoro voice at 1.2x speed, one voice per
+account. 15% of each account's format mix; also allowed for breakdowns, India guides and news.
 
 ## Style (from the owner's reference video)
 - Vertical 1080x1920, ~30-60 s, narrated throughout.
