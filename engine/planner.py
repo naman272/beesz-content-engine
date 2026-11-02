@@ -80,10 +80,15 @@ def proven_hooks(limit: int = 12) -> list[str]:
     return [w["hook"] for w in winners(limit)]
 
 
-def winners(limit: int = 6) -> list[dict]:
-    """Top-performing hooks (winners and references), best first."""
-    return db.select("hooks", {"active": "is.true"}, columns="hook,hook_type,topic,format,views,source",
-                     order="views.desc.nullslast", limit=limit)
+def winners(limit: int = 4, references: int = 3) -> list[dict]:
+    """Top-performing hooks, plus the owner's recent Telegram references (last 14 days)."""
+    cols = "hook,hook_type,topic,format,views,source"
+    top = db.select("hooks", {"active": "is.true", "source": "eq.winner"}, columns=cols,
+                    order="views.desc.nullslast", limit=limit)
+    since = (datetime.now(ZoneInfo("UTC")) - timedelta(days=14)).isoformat()
+    refs = db.select("hooks", {"active": "is.true", "source": "eq.reference", "created_at": f"gte.{since}"},
+                     columns=cols, order="created_at.desc", limit=references)
+    return top + refs
 
 
 def plan_angles(topic_counts: Counter, avoid: list[str]) -> dict[str, list[str]]:

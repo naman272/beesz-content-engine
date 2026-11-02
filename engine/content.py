@@ -308,8 +308,11 @@ def winner_params(model: str, account: dict, fmt: str, count: int, winners: list
                   avoid_hooks: list[str] = (), fix_notes: str = "") -> dict:
     """Posts that reuse the PATTERN behind current winners on new topics (the 'exploit' share of the plan)."""
     params = request_params(model, account, "starting_up", count, fmt=fmt, avoid_hooks=avoid_hooks)
-    listed = "\n".join(f"- \"{w['hook']}\" ({w.get('hook_type')}, {w.get('topic')}, {w.get('views')} views)" for w in winners)
-    task = (f"Write {count} {FORMAT_LABELS[fmt]}(s). These posts are our current winners:\n{listed}\n\n"
+    listed = "\n".join(
+        f"- \"{w['hook']}\" ({w.get('hook_type')}, {w.get('topic')}, "
+        + ("a reference the owner wants more of)" if w.get("source") == "reference" else f"{w.get('views')} views)")
+        for w in winners)
+    task = (f"Write {count} {FORMAT_LABELS[fmt]}(s). These are our current winners and the owner's references:\n{listed}\n\n"
             "Work out WHY they won (the kind of insight, the tension in the hook, how specific it is) and apply "
             "that same pattern to NEW topics founders care about. Never reuse their topics or paraphrase their "
             "hooks. Each post a different topic. Pick the topic field that fits each post.")
