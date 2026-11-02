@@ -58,6 +58,22 @@ def download_telegram_file(file_id: str, folder: Path) -> Path | None:
     return path
 
 
+def download_photo(message: dict, folder: Path) -> Path | None:
+    photo = message.get("photo") or []
+    if not photo:
+        doc = message.get("document") or {}
+        if not doc.get("mime_type", "").startswith("image/"):
+            return None
+        file_id = doc["file_id"]
+    else:
+        file_id = max(photo, key=lambda p: p.get("width", 0))["file_id"]
+    info = telegram._call("getFile", json={"file_id": file_id})
+    data = requests.get(f"https://api.telegram.org/file/bot{env('TELEGRAM_BOT_TOKEN')}/{info['file_path']}", timeout=60)
+    path = folder / f"photo_{message['message_id']}.jpg"
+    path.write_bytes(data.content)
+    return path
+
+
 def frames(video: Path, folder: Path, count: int = 4) -> list[Path]:
     paths = []
     for i, t in enumerate((0.5, 2.0, 5.0, 9.0)[:count]):
@@ -80,7 +96,8 @@ def analyse(note: str, url: str, caption: str, page_text: str, images: list[Path
                                            "data": base64.b64encode(p.read_bytes()).decode()}} for p in images]
     blocks.append({"type": "text", "text": (
         "The owner of 5 founder-education Instagram accounts sent this as a reference for what kind of content to "
-        "post. Work out the hook (the opening line or on-screen text), the hook style, which of our formats it is "
+        "post (frames from a video, or screenshots of carousel slides). Work out the hook (the opening line, cover "
+        "slide or on-screen text), the hook style, which of our formats it is "
         "closest to, why it works, and how we should use the PATTERN (never copy the content).\n"
         f"Owner's note: {note or '(none)'}\nLink: {url or '(uploaded video)'}\nCaption: {caption or '(unavailable)'}\n"
         f"Page text: {page_text[:3000] or '(unavailable)'}\nFrames attached: {len(images)}")})
@@ -92,62 +109,76 @@ def analyse(note: str, url: str, caption: str, page_text: str, images: list[Path
     return json.loads(next(b.text for b in message.content if b.type == "text"))
 
 
-def handle(message: dict) -> None:
-    text = message.get("text") or message.get("caption") or ""
+def handle(group: list[dict]) -> None:
+    """group: one message, or all messages of one Telegram album (photos sent together)."""
+    message = group[0]
+    text = " ".join((m.get("text") or m.get("caption") or "") for m in group).strip()
     urls = URL.findall(text)
-    if not urls and not message.get("video") and not message.get("document") and len(text) > 20:
-        # A plain note describing content is a reference too
-        card = analyse(text, "", "", text, [])
-        db.insert("hooks", {"hook": card["hook"][:500], "hook_type": card["hook_type"], "format": card["format"],
-                            "topic": card["topic"], "source": "reference", "active": True})
-        reply(message, f"✅ Noted for next week's plan.\nIdea: {card['hook']}\nHow we'll use it: {card['how_we_use_it']}")
-        return
-    video_file = (message.get("video") or {}).get("file_id") or (
-        (message.get("document") or {}).get("file_id") if "video" in (message.get("document") or {}).get("mime_type", "") else None)
-    if not urls and not video_file:
-        return
     note = URL.sub("", text).strip()
     with tempfile.TemporaryDirectory() as tmp:
         folder = Path(tmp)
+        photos = [p for p in (download_photo(m, folder) for m in group) if p]
+        if not urls and not photos and not message.get("video") and not message.get("document") and len(text) > 20:
+            # A plain note describing content is a reference too
+            card = analyse(text, "", "", text, [])
+            save(card)
+            reply(message, f"✅ Noted for next week's plan.\nIdea: {card['hook']}\nHow we'll use it: {card['how_we_use_it']}")
+            return
+        video_file = (message.get("video") or {}).get("file_id") or (
+            (message.get("document") or {}).get("file_id") if "video" in (message.get("document") or {}).get("mime_type", "") else None)
+        if not urls and not video_file and not photos:
+            return
         url = urls[0] if urls else ""
+        if url and not url.startswith("http"):
+            url = "https://" + url
         video, caption, page_text = None, "", ""
         if video_file:
             video = download_telegram_file(video_file, folder)
-        elif re.search(r"instagram\.com|youtube\.com|youtu\.be|tiktok\.com", url):
+        elif url and re.search(r"instagram\.com/p/", url) and not photos:
+            reply(message, "📸 That looks like a carousel. I can't open Instagram image posts from a link. Send "
+                           "screenshots of the slides here (select them all and send together) and I'll analyse them.")
+            return
+        elif url and re.search(r"instagram\.com|youtube\.com|youtu\.be|tiktok\.com", url):
             video, caption = download_link(url, folder)
-        else:
+        elif url:
             page_text = fetch_text(url)
-        if url and not url.startswith("http"):
-            url = "https://" + url
-        images = frames(video, folder) if video else []
-        print(f"message {message['message_id']}: url={url[:80]!r} upload={bool(video_file)} video={bool(video)} "
+        images = (frames(video, folder) if video else []) + photos[:8]
+        print(f"message {message['message_id']}: url={url[:80]!r} video={bool(video)} photos={len(photos)} "
               f"frames={len(images)} caption={len(caption)} page_text={len(page_text)}")
         if not images and not caption and not page_text:
-            reply(message, "⚠️ I couldn't open this one (the video didn't download and there was no caption or page "
-                           "text to read). Send the video file itself here, or a line describing what you liked.")
+            reply(message, "⚠️ I couldn't open this one (no video, images, caption or page text to read). Send the "
+                           "video file or screenshots here, or a line describing what you liked.")
             return
         card = analyse(note, url, caption, page_text, images)
-    db.insert("hooks", {"hook": card["hook"][:500], "hook_type": card["hook_type"], "format": card["format"],
-                        "topic": card["topic"], "source": "reference", "active": True})
-    seen = "video analysed" if images else ("caption only, video not downloadable; send the file for a full read" if url and not page_text else "page text")
+    save(card)
+    seen = f"{len(photos)} screenshot(s)" if photos else ("video analysed" if video else ("caption only" if caption else "page text"))
     reply(message, f"✅ Added to next week's plan as a reference ({seen}).\n\nHook: {card['hook']}\n"
                    f"Style: {card['hook_type']} · Closest format: {card['format']} · Topic: {card['topic']}\n"
                    f"Why it works: {card['why_it_works']}\nHow we'll use it: {card['how_we_use_it']}")
+
+
+def save(card: dict) -> None:
+    db.insert("hooks", {"hook": card["hook"][:500], "hook_type": card["hook_type"], "format": card["format"],
+                        "topic": card["topic"], "source": "reference", "active": True})
 
 
 def main() -> None:
     chat = str(env("TELEGRAM_CHAT_ID"))
     items = updates()
     print(f"{len(items)} updates")
+    groups: dict[str, list[dict]] = {}
     for u in items:
         message = u.get("message") or u.get("channel_post") or {}
         if str(message.get("chat", {}).get("id")) != chat or message.get("from", {}).get("is_bot"):
             continue
+        key = message.get("media_group_id") or f"single-{message.get('message_id')}"
+        groups.setdefault(key, []).append(message)
+    for group in groups.values():
         try:
-            handle(message)
+            handle(group)
         except Exception as e:
-            print(f"failed on message {message.get('message_id')}: {e}")
-            reply(message, f"⚠️ Couldn't analyse this one ({type(e).__name__}). Try sending the video file directly.")
+            print(f"failed on message {group[0].get('message_id')}: {e}")
+            reply(group[0], f"⚠️ Couldn't analyse this one ({type(e).__name__}). Try sending screenshots or the video file.")
     if items:
         confirm(items[-1]["update_id"])
 
