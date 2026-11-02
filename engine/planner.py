@@ -124,10 +124,10 @@ CAROUSEL_ONLY = ("funding_roundup",)  # one round per slide reads best as a caro
 KIND_FORMATS = {
     "evergreen": None,  # any
     "reddit_qa": None,
-    "breakdown": ("carousel", "reaction", "animated", "myth_fact"),
-    "india_admin": ("carousel", "reaction", "animated", "checklist"),
+    "breakdown": ("carousel", "reaction", "animated", "myth_fact", "explainer"),
+    "india_admin": ("carousel", "reaction", "animated", "checklist", "explainer"),
     "funding_roundup": ("carousel",),
-    "news": ("carousel", "reaction", "animated"),
+    "news": ("carousel", "reaction", "animated", "explainer"),
     "winner": None,
 }
 

@@ -19,7 +19,7 @@ ramp: [2, 4]             # posts/day in week 1 and week 2 after launch, then pos
 # india_admin (Indian schemes/compliance guides). Sources live in config/sources.yaml.
 
 # Formats the engine can render today. Others in format_mix wait until they're built.
-ready_formats: [carousel, reaction, chat, myth_fact, checklist, animated]
+ready_formats: [carousel, reaction, chat, myth_fact, checklist, animated, explainer]
 format_switch_date: 2026-11-04   # slots on/after this date use format_mix_next (end of the hook test)
 
 accounts:
@@ -33,7 +33,7 @@ accounts:
     fonts: {heading: "Archivo Black", body: "Inter"}
     background_style: photo   # photo | illustration | any
     format_mix: {reaction: 0.85, carousel: 0.15}
-    format_mix_next: {reaction: 0.25, chat: 0.25, myth_fact: 0.15, checklist: 0.1, animated: 0.1, carousel: 0.15}   # from format_switch_date
+    format_mix_next: {reaction: 0.2, chat: 0.2, explainer: 0.15, myth_fact: 0.1, checklist: 0.1, animated: 0.1, carousel: 0.15}   # from format_switch_date
     content_mix: {evergreen: 0.4, reddit_qa: 0.4, breakdown: 0.2}
     post_times: ["07:10", "09:40", "12:20", "15:05", "18:30", "21:15"]
 
@@ -47,7 +47,7 @@ accounts:
     fonts: {heading: "Fraunces", body: "Inter"}
     background_style: illustration   # photo | illustration | any
     format_mix: {reaction: 0.85, carousel: 0.15}
-    format_mix_next: {reaction: 0.2, checklist: 0.25, chat: 0.2, myth_fact: 0.1, animated: 0.1, carousel: 0.15}   # from format_switch_date
+    format_mix_next: {reaction: 0.15, checklist: 0.2, chat: 0.15, explainer: 0.15, myth_fact: 0.1, animated: 0.1, carousel: 0.15}   # from format_switch_date
     content_mix: {evergreen: 0.2, reddit_qa: 0.4, india_admin: 0.4}
     post_times: ["07:45", "10:15", "13:00", "16:10", "19:05", "21:50"]
 
@@ -61,7 +61,7 @@ accounts:
     fonts: {heading: "Space Grotesk", body: "JetBrains Mono"}
     background_style: photo   # photo | illustration | any
     format_mix: {reaction: 0.85, carousel: 0.15}
-    format_mix_next: {reaction: 0.2, myth_fact: 0.25, checklist: 0.15, chat: 0.15, animated: 0.1, carousel: 0.15}   # from format_switch_date
+    format_mix_next: {reaction: 0.15, myth_fact: 0.2, explainer: 0.15, checklist: 0.15, chat: 0.1, animated: 0.1, carousel: 0.15}   # from format_switch_date
     content_mix: {evergreen: 0.3, reddit_qa: 0.2, india_admin: 0.3, breakdown: 0.2}   # + weekly funding roundup
     post_times: ["08:05", "10:50", "13:35", "16:40", "19:40", "22:20"]
 
@@ -75,7 +75,7 @@ accounts:
     fonts: {heading: "Montserrat", body: "Poppins"}
     background_style: illustration   # photo | illustration | any
     format_mix: {reaction: 0.85, carousel: 0.15}
-    format_mix_next: {reaction: 0.3, chat: 0.2, animated: 0.15, myth_fact: 0.1, checklist: 0.1, carousel: 0.15}   # from format_switch_date
+    format_mix_next: {reaction: 0.25, chat: 0.15, explainer: 0.15, animated: 0.1, myth_fact: 0.1, checklist: 0.1, carousel: 0.15}   # from format_switch_date
     content_mix: {evergreen: 0.4, reddit_qa: 0.6}
     post_times: ["07:25", "10:00", "12:45", "15:30", "18:50", "21:35"]
 
@@ -89,6 +89,6 @@ accounts:
     fonts: {heading: "DM Serif Display", body: "Inter"}
     background_style: photo   # photo | illustration | any
     format_mix: {reaction: 0.85, carousel: 0.15}
-    format_mix_next: {reaction: 0.3, myth_fact: 0.2, chat: 0.15, animated: 0.1, checklist: 0.1, carousel: 0.15}   # from format_switch_date
+    format_mix_next: {reaction: 0.25, explainer: 0.15, myth_fact: 0.15, chat: 0.1, animated: 0.1, checklist: 0.1, carousel: 0.15}   # from format_switch_date
     content_mix: {breakdown: 0.7, reddit_qa: 0.3}   # real stories only
     post_times: ["08:20", "11:05", "14:10", "17:00", "20:00", "22:40"]

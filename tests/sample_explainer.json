@@ -1,0 +1,116 @@
+{
+  "topic": "growth_sales",
+  "hook_type": "callout",
+  "hook": "bro why are you running ads when nobody has paid you yet??",
+  "beats": [
+    {
+      "say": "Stop spending on ads before anyone has paid you, because you don't even know which message works yet.",
+      "emphasis": "ads",
+      "gesture": "point",
+      "visual": {
+        "type": "big_text",
+        "title": "",
+        "value": "STOP ADS",
+        "label": "",
+        "items": []
+      }
+    },
+    {
+      "say": "Write down a list of people who have the exact problem you solve, by name, not by audience type.",
+      "emphasis": "by name",
+      "gesture": "explain",
+      "visual": {
+        "type": "checklist",
+        "title": "Your first list",
+        "value": "",
+        "label": "",
+        "items": [
+          "Old colleagues",
+          "WhatsApp groups",
+          "LinkedIn contacts",
+          "Local businesses"
+        ]
+      }
+    },
+    {
+      "say": "Message them one by one, not a broadcast, and ask about their problem before you pitch anything.",
+      "emphasis": "one by one",
+      "gesture": "explain",
+      "visual": {
+        "type": "chat",
+        "title": "How do you handle this today?",
+        "value": "",
+        "label": "",
+        "items": []
+      }
+    },
+    {
+      "say": "If they describe the pain in their own words, ask for a short call that same week.",
+      "emphasis": "same week",
+      "gesture": "point",
+      "visual": {
+        "type": "calendar",
+        "title": "Book the call",
+        "value": "THIS WEEK",
+        "label": "",
+        "items": []
+      }
+    },
+    {
+      "say": "On the call, ask them to pay or prepay something, because 'sounds cool' isn't a customer.",
+      "emphasis": "pay",
+      "gesture": "shrug",
+      "visual": {
+        "type": "versus",
+        "title": "Real signal",
+        "value": "",
+        "label": "",
+        "items": [
+          "Sounds cool",
+          "Paid via UPI"
+        ]
+      }
+    },
+    {
+      "say": "Track every message, reply and payment in one simple sheet so you can see which line actually works.",
+      "emphasis": "one simple sheet",
+      "gesture": "think",
+      "visual": {
+        "type": "cards",
+        "title": "Your pipeline",
+        "value": "",
+        "label": "",
+        "items": [
+          "Sent",
+          "Replied",
+          "Called",
+          "Paid"
+        ]
+      }
+    },
+    {
+      "say": "Once people pay, call them and ask why they bought, then copy their exact words into your pitch.",
+      "emphasis": "their exact words",
+      "gesture": "mouth",
+      "visual": {
+        "type": "phone_stats",
+        "title": "Customer call",
+        "value": "WHY?",
+        "label": "Use their words",
+        "items": []
+      }
+    }
+  ],
+  "music_mood": "calm",
+  "cta": "Save this. Send ten personal DMs today, not tomorrow.",
+  "caption": "Ads don't fix a message nobody has tested. They just make you lose money faster.\n\nYour first customers come from manual work. Make a list of real people with the problem. DM them one by one. Ask about the pain before you pitch. Get them on a call. Ask for payment. Track everything in one sheet. Then steal your buyers' words for your copy.\n\nOnly after that do ads make sense, because now you know what actually sells.\n\nHow many personal DMs did you send this week? Be honest.",
+  "hashtags": [
+    "founders",
+    "startupindia",
+    "firstcustomers",
+    "salestips",
+    "earlystage",
+    "bootstrapping"
+  ],
+  "facts_used": []
+}
