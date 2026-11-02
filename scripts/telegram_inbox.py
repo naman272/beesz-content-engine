@@ -118,7 +118,8 @@ def handle(group: list[dict]) -> None:
     with tempfile.TemporaryDirectory() as tmp:
         folder = Path(tmp)
         photos = [p for p in (download_photo(m, folder) for m in group) if p]
-        if not urls and not photos and not message.get("video") and not message.get("document") and len(text) > 20:
+        # A standalone note is an idea only if it's substantial; short labels ("this is the first post") are skipped
+        if not urls and not photos and not message.get("video") and not message.get("document") and len(text.split()) >= 8:
             # A plain note describing content is a reference too
             card = analyse(text, "", "", text, [])
             save(card)
@@ -150,6 +151,9 @@ def handle(group: list[dict]) -> None:
                            "video file or screenshots here, or a line describing what you liked.")
             return
         card = analyse(note, url, caption, page_text, images)
+    if re.match(r"(not determinable|unavailable|unknown)", card["hook"], re.I):
+        reply(message, "⚠️ I couldn't make out a clear hook from this one, so I didn't add it. Try including the cover slide.")
+        return
     save(card)
     seen = f"{len(photos)} screenshot(s)" if photos else ("video analysed" if video else ("caption only" if caption else "page text"))
     reply(message, f"✅ Added to next week's plan as a reference ({seen}).\n\nHook: {card['hook']}\n"
