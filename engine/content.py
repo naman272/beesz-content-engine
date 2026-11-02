@@ -164,11 +164,17 @@ def system_prompt() -> str:
     )
 
 
+LEARNINGS: list[str] = []  # set by scripts.plan_week from the Sunday review
+
+
 def account_brief(account: dict, avoid_hooks: list[str], proven_hooks: list[str]) -> str:
     lines = [
         f"ACCOUNT: @{account['handle']} - {account['persona']}",
         f"VOICE: {account['voice']}",
     ]
+    if LEARNINGS:
+        lines.append("LAST WEEK'S LEARNINGS (from our own numbers; lean into what worked, fix what didn't):")
+        lines += [f"- {x}" for x in LEARNINGS]
     if proven_hooks:
         lines.append("PROVEN HOOKS (performed well; write fresh variations of their pattern, never copies):")
         lines += [f"- {h}" for h in proven_hooks]

@@ -1,8 +1,8 @@
-name: Weekly review
+name: Weekly review and plan
 
 on:
   schedule:
-    - cron: "30 13 * * 0"
+    - cron: "30 19 * * 6"   # Sunday 01:00 IST, after Saturday's nightly stats
   workflow_dispatch:
     inputs:
       force:
@@ -62,3 +62,6 @@ jobs:
       - run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
       - run: python -m playwright install --with-deps chromium
       - run: python -m scripts.weekly_review ${{ inputs.force && '--force' || '' }}
+      # Plan next week (Sunday-Saturday) with this review's learnings, even if the review step failed
+      - if: always()
+        run: python -m scripts.plan_week

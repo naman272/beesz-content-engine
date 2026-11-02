@@ -1,9 +1,10 @@
-"""Plans the next 7 days of posts and submits them to the Anthropic Batch API (50% cheaper).
-Results are picked up by scripts.collect_batches.
+"""Plans next week (Sunday to Saturday) once a week, right after the Sunday review, and submits it to the
+Anthropic Batch API (50% cheaper). Results are picked up by scripts.collect_batches.
 
-Run: python -m scripts.plan_week               # plans the 7 days after the last scheduled post
-     python -m scripts.plan_week --force       # plan even if a week is already queued
+Run: python -m scripts.plan_week               # plans the week starting this/next Sunday, if not planned yet
+     python -m scripts.plan_week --force       # plan even if that week is already planned
 """
+import json
 import sys
 from datetime import date, datetime, timedelta
 from zoneinfo import ZoneInfo
@@ -13,16 +14,23 @@ from anthropic.types.message_create_params import MessageCreateParamsNonStreamin
 from anthropic.types.messages.batch_create_params import Request
 
 from engine import content, db, llm, planner, telegram
-from engine.config import env, load_accounts
+from engine.config import ROOT, env, load_accounts
 
 
-def next_start(cfg: dict) -> date:
-    tz = ZoneInfo(cfg["timezone"])
-    tomorrow = datetime.now(tz).date() + timedelta(days=1)
-    last = db.select("posts", {"status": "neq.dropped"}, columns="scheduled_at", order="scheduled_at.desc", limit=1)
-    after_last = (datetime.fromisoformat(last[0]["scheduled_at"]).astimezone(tz).date() + timedelta(days=1)
-                  if last else tomorrow)
-    return max(cfg["launch_date"], tomorrow, after_last)
+def week_start(cfg: dict) -> date:
+    """Weeks run Sunday to Saturday. On Sunday that's today; otherwise the coming Sunday."""
+    today = datetime.now(ZoneInfo(cfg["timezone"])).date()
+    return max(cfg["launch_date"], today + timedelta(days=(6 - today.weekday()) % 7))
+
+
+def load_learnings() -> list[str]:
+    """What last week's review found (written by scripts.weekly_review just before planning)."""
+    path = ROOT / "output" / "weekly_insights.json"
+    if not path.exists():
+        return []
+    data = json.loads(path.read_text())
+    return ([f"Working: {w}" for w in data.get("working", [])] + [f"Not working: {w}" for w in data.get("not_working", [])]
+            + [f"Try: {x['title']} ({x['why']})" for x in data.get("suggestions", [])[:3]])
 
 
 def main() -> None:
@@ -31,11 +39,11 @@ def main() -> None:
     if db.select("batches", {"status": "eq.submitted"}, columns="id") and not force:
         print("A batch is still being written; skipping.")
         return
-    start = next_start(cfg)
-    today = datetime.now(ZoneInfo(cfg["timezone"])).date()
-    if (start - today).days > 3 and not force:
-        print(f"Already planned until {start - timedelta(days=1)}; skipping.")
+    start = week_start(cfg)
+    if db.select("batches", {"week_start": f"eq.{start.isoformat()}"}, columns="id") and not force:
+        print(f"Week of {start} is already planned; skipping.")
         return
+    content.LEARNINGS = load_learnings()
 
     plan = planner.build_week(cfg, start)
     accounts = {a["id"]: a for a in cfg["accounts"]}

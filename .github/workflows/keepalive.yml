@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: |
-          for wf in hourly.yml render.yml plan-week.yml nightly.yml weekly-review.yml telegram-inbox.yml; do
+          for wf in hourly.yml render.yml nightly.yml weekly-review.yml telegram-inbox.yml; do
             gh workflow enable "$wf" --repo "$GITHUB_REPOSITORY"
           done
         env:

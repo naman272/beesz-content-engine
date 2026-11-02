@@ -20,12 +20,14 @@ acc5 foundr_world (Storyteller, real company stories only). Profiles in `config/
   Haiku 5.5 filters). Secrets: `.env` locally, GitHub Secrets in CI. `PUBLISHING_ENABLED` repo variable.
 
 ## Jobs (.github/workflows)
-- `plan-week` daily, acts when <=3 days of queue left: slots, format/topic/kind mix, sources, Opus batch.
+- `weekly-review` ("Weekly review and plan") Sunday 01:00 IST: scorecard + analysis of the week, learnings saved to
+  output/weekly_insights.json, then `plan_week` plans and writes Sunday-Saturday in one batch with those
+  learnings in the brief. The owner wants planning ONLY on Sundays: no mid-week re-plans or refills.
+- `plan-week`: manual only now (same planner).
 - `hourly`: collect finished batches (checks + one rewrite), news scan (score >= 8), publish due posts.
 - `render` every 4h: render posts due in 7h, upload to R2. Animated formats use HyperFrames (Node 22).
 - `nightly`: metrics (all IG insights), winners (>=1000 views or 3x account median within ~72h), daily
   report, token refresh, media cleanup. Each step isolated.
-- `weekly-review` Sunday 19:00 IST: scorecard vs `config/benchmarks.yaml`, suggestions + samples.
 - `telegram-inbox` every 3h: reads links/videos/notes the owner sends the bot (private chat), analyses
   them with Haiku (frames via yt-dlp/ffmpeg), saves as `hooks` source=reference (fed into the winner share),
   replies to each message. Telegram keeps unread updates only 24h. No webhook by owner's choice.

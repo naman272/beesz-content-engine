@@ -226,9 +226,11 @@ def main() -> None:
     print(report)
     telegram.send_message(report)
 
-    if not (rework or "--force" in sys.argv) or not this_week:
+    if not this_week:
         return
     result = analyse(acc_cfg, week, target, this_week, scorecard)
+    (ROOT / "output").mkdir(exist_ok=True)
+    (ROOT / "output" / "weekly_insights.json").write_text(json.dumps(result, indent=2))  # read by plan_week
     msg = ["🧠 What the data says", result["diagnosis"], "", "Working:"] + [f"• {w}" for w in result["working"]]
     msg += ["", "Not working:"] + [f"• {w}" for w in result["not_working"]]
     msg += ["", "Suggested content to add:"]
@@ -236,10 +238,11 @@ def main() -> None:
             for i, s in enumerate(result["suggestions"], 1)]
     if result["mix_changes"]:
         msg += ["", "Suggested mix changes:"] + [f"• @{handles[m['account']]}: {m['change']}" for m in result["mix_changes"]]
-    msg += ["", "Nothing changes until you approve. Reply in Claude with the numbers you want."]
+    msg += ["", "These learnings go into next week's plan, written right after this review."]
     print("\n".join(msg))
     telegram.send_message("\n".join(msg))
-    send_samples(acc_cfg, result["suggestions"], cfg["sample_posts"])
+    if rework or "--force" in sys.argv:
+        send_samples(acc_cfg, result["suggestions"], cfg["sample_posts"])
 
 
 if __name__ == "__main__":
