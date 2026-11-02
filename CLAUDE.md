@@ -26,6 +26,9 @@ acc5 foundr_world (Storyteller, real company stories only). Profiles in `config/
 - `nightly`: metrics (all IG insights), winners (>=1000 views or 3x account median within ~72h), daily
   report, token refresh, media cleanup. Each step isolated.
 - `weekly-review` Sunday 19:00 IST: scorecard vs `config/benchmarks.yaml`, suggestions + samples.
+- `telegram-inbox` every 3h: reads links/videos/notes the owner sends the bot (private chat), analyses
+  them with Haiku (frames via yt-dlp/ffmpeg), saves as `hooks` source=reference (fed into the winner share),
+  replies to each message. Telegram keeps unread updates only 24h. No webhook by owner's choice.
 - `keepalive` weekly: re-enables schedules (public repos pause them after 60 days without commits).
 
 ## Content strategy (decided with the owner)
