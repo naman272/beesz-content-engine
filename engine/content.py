@@ -30,13 +30,15 @@ LIMITS = {
     "chat": {"hook": 60, "message": 90, "cta": 60, "caption": 1500, "role": 20},
     "myth_fact": {"hook": 60, "myth": 80, "fact": 110, "cta": 60, "caption": 1500},
     "checklist": {"hook": 60, "item": 60, "cta": 60, "caption": 1500},
+    "explainer": {"hook": 70, "say": 150, "cta": 80, "caption": 1500},
 }
 
 # Every non-carousel format is a Reel
-REEL_FORMATS = ("reaction", "animated", "chat", "myth_fact", "checklist")
+REEL_FORMATS = ("reaction", "animated", "chat", "myth_fact", "checklist", "explainer")
 FORMAT_LABELS = {
     "carousel": "carousel post", "reaction": "reaction Reel script", "animated": "animated text Reel script",
     "chat": "animated chat Reel script", "myth_fact": "myth vs fact Reel script", "checklist": "checklist Reel script",
+    "explainer": "narrated explainer Reel script",
 }
 
 FORMAT_GUIDES = {
@@ -72,6 +74,17 @@ FORMAT_GUIDES = {
     "checklist": (
         "CHECKLIST REEL: a clipboard titled with the hook, then 4-5 items that get ticked off one by one; each item "
         "is a concrete action. Limits: hook {hook}, each item {item}, cta {cta}."
+    ),
+    "explainer": (
+        "NARRATED EXPLAINER REEL (30-45 seconds, spoken by a voiceover): the hook is said first, then 5-7 beats, "
+        "then the CTA is said. Each beat 'say' is ONE natural spoken sentence (how a person talks, contractions "
+        "welcome). emphasis = 1-2 words from that sentence to highlight. gesture = the presenter's move. visual = "
+        "one UI-style illustration that shows the beat: phone_stats (a profile/stats screen: title, value, label), "
+        "stamp (a document stamped with value), counter (a big number counting up), chart (a rising line with "
+        "value), chat (an AI/chat box typing title), checklist (items), calendar (value like NOW or a day), cards "
+        "(items stacked), versus (items = [before, after]), progress (value as a percent), big_text (value). Keep "
+        "visual text very short (value max 12 chars, items max 6 words). Vary the visuals across beats. "
+        "Limits: hook {hook}, each say {say}, cta {cta}."
     )
 }
 
@@ -211,6 +224,15 @@ def post_schema(fmt: str) -> dict:
     elif fmt == "myth_fact":
         pair = _obj({"myth": {"type": "string"}, "fact": {"type": "string"}})
         post = _obj({**common, "pairs": {"type": "array", "items": pair},
+                     "music_mood": {"type": "string", "enum": assets.music_moods()}, **tail})
+    elif fmt == "explainer":
+        from engine.render.explainer import GESTURES, VISUALS
+        vis = _obj({"type": {"type": "string", "enum": list(VISUALS)}, "title": {"type": "string"},
+                    "value": {"type": "string"}, "label": {"type": "string"},
+                    "items": {"type": "array", "items": {"type": "string"}}})
+        beat = _obj({"say": {"type": "string"}, "emphasis": {"type": "string"},
+                     "gesture": {"type": "string", "enum": list(GESTURES)}, "visual": vis})
+        post = _obj({**common, "beats": {"type": "array", "items": beat},
                      "music_mood": {"type": "string", "enum": assets.music_moods()}, **tail})
     elif fmt == "checklist":
         post = _obj({**common, "items": {"type": "array", "items": {"type": "string"}},

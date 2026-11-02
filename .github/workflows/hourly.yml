@@ -49,6 +49,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
+      - uses: actions/cache@v4
+        with:
+          path: models
+          key: kokoro-v1.0-int8
       - run: pip install -r requirements.txt
       - run: python -m scripts.collect_batches
       - id: news

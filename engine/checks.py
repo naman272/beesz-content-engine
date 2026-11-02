@@ -24,6 +24,9 @@ def _all_text(post: dict) -> str:
     parts += [m["text"] for m in post.get("messages", [])]
     parts += [x for p in post.get("pairs", []) for x in (p["myth"], p["fact"])]
     parts += post.get("items", [])
+    for b in post.get("beats", []):
+        v = b.get("visual") or {}
+        parts += [b["say"], v.get("title", ""), v.get("value", ""), v.get("label", ""), *(v.get("items") or [])]
     return "\n".join(parts)
 
 
@@ -92,6 +95,13 @@ def check_post(post: dict, fmt: str = "carousel", recent_hooks: list[str] = (),
         for i, p in enumerate(post["pairs"], 1):
             _too_long(problems, f"myth {i}", p["myth"], limits["myth"])
             _too_long(problems, f"fact {i}", p["fact"], limits["fact"])
+    elif fmt == "explainer":
+        if not 5 <= len(post["beats"]) <= 7:
+            problems.append(f"needs 5-7 beats, got {len(post['beats'])}")
+        for i, b in enumerate(post["beats"], 1):
+            _too_long(problems, f"beat {i}", b["say"], limits["say"])
+            if len(str((b.get("visual") or {}).get("value", ""))) > 14:
+                problems.append(f"beat {i} visual value too long")
     elif fmt == "checklist":
         if not 4 <= len(post["items"]) <= 5:
             problems.append(f"needs 4-5 items, got {len(post['items'])}")

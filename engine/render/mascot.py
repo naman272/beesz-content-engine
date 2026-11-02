@@ -56,6 +56,7 @@ def character(look: dict) -> str:
       <g class="mouth" id="m-shocked"><ellipse cx="300" cy="462" rx="34" ry="44" fill="#1A1A1A"/><ellipse cx="300" cy="486" rx="20" ry="12" fill="#E8667A"/></g>
       <g class="mouth" id="m-skeptical"><path d="M258 462 Q300 448 346 470" stroke="#1A1A1A" stroke-width="12" fill="none" stroke-linecap="round"/></g>
       <g class="mouth" id="m-thinking"><circle cx="318" cy="462" r="13" fill="#1A1A1A"/></g>
+      <g class="mouth" id="m-talk"><ellipse id="talkshape" cx="300" cy="460" rx="30" ry="18" fill="#1A1A1A"/></g>
       {extra}
       <g id="burst" stroke="#FFFFFF" stroke-width="14" stroke-linecap="round"><line x1="104" y1="176" x2="58" y2="124"/><line x1="300" y1="112" x2="300" y2="46"/><line x1="496" y1="176" x2="542" y2="124"/></g>
     </g>

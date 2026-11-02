@@ -11,3 +11,6 @@ assets/music/
 
 # Licensed media lives in its own private repo (naman272/beesz-content-media), checked out here
 media/
+
+# downloaded voice model files (fetched by CI, not committed)
+models/

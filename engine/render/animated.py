@@ -150,7 +150,7 @@ def _disable_telemetry() -> None:
         _telemetry_off = True
 
 
-def render_project(page: str, music: Path, out: Path) -> Path:
+def render_project(page: str, music: Path, out: Path, extra: dict[str, Path] | None = None) -> Path:
     """Writes a HyperFrames project for `page` (fonts, GSAP, music) and renders it to `out`."""
     _disable_telemetry()
     project = out.parent / "hf_project"
@@ -161,6 +161,8 @@ def render_project(page: str, music: Path, out: Path) -> Path:
         shutil.copy(f, project / "assets" / "fonts" / f.name)
     shutil.copy(GSAP, project / "assets" / "gsap.min.js")
     shutil.copy(music, project / "assets" / "music.mp3")
+    for name, path in (extra or {}).items():
+        shutil.copy(path, project / "assets" / name)
     (project / "index.html").write_text(page)
     (project / "meta.json").write_text(json.dumps({"id": "beesz-reel", "name": "beesz-reel"}))
     subprocess.run(["npx", "--yes", HYPERFRAMES, "render", str(project), "-o", str(out),

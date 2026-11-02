@@ -5,7 +5,7 @@ from pathlib import Path
 
 from engine import assets, db, storage
 from engine.config import ROOT
-from engine.render import animated, carousel, formats2d, reaction
+from engine.render import animated, carousel, explainer, formats2d, reaction
 
 WORK = ROOT / "output" / "render"
 
@@ -47,6 +47,13 @@ def render(post_row: dict, account: dict) -> tuple[list[Path], dict]:
         video = reaction.render(post, account, clip, backgrounds, assets.path(music["file"]), out / "reel.mp4")
         return [video], {"backgrounds": [b["file"] for b in backgrounds], "music": music["file"],
                          "music_credit": f"{music['title']} - {music['artist']}", "reaction": clip["file"]}
+
+    if fmt == "explainer":
+        music = assets.pick_music(post["music_mood"], avoid)
+        out.mkdir(parents=True, exist_ok=True)
+        video = explainer.render(post, account, assets.path(music["file"]), out / "reel.mp4")
+        shutil.rmtree(out / "hf_project", ignore_errors=True)
+        return [video], {"music": music["file"], "music_credit": f"{music['title']} - {music['artist']}"}
 
     if fmt == "animated" or fmt in formats2d.FORMATS:
         music = assets.pick_music(post["music_mood"], avoid)
