@@ -1,5 +1,27 @@
 # Character prompt pack (ChatGPT image generation)
 
+**Start: one shared character for all 5 accounts, 8 poses (8 images).** Per-account characters can come later
+(their master prompts are kept below); the renderer uses `assets/characters/<account>/` if it exists, else
+`assets/characters/shared/`, and falls back to the current mascot for any missing pose.
+
+## Quick start (about 15 minutes)
+1. Open a new ChatGPT chat and paste the **shared master prompt** below. Regenerate until you like him.
+2. In the same chat, send the 8 **core pose prompts** one at a time.
+3. Save each PNG as `~/code/beesz-content-engine/assets/characters/shared/<pose>.png` (exact names below).
+4. Tell Claude "character poses are in".
+
+**Shared master prompt**
+> Create a character for an animated explainer series about startups: an Indian man in his late 20s, short
+> textured hair, neat short beard, friendly confident expression, black hoodie with a small white logo dot on
+> the chest. Waist-up, facing the viewer, arms relaxed, transparent background, no text. Polished 2D cartoon
+> illustration with clean outlines and soft cel shading, premium explainer-video style. Portrait 1024x1536.
+
+**Core poses (8):** `neutral`, `point_side`, `explain`, `thinking`, `shocked`, `thumbs_up`, `shrug`, `celebrate`
+(prompts in the pose table below). The other 4 (`point_up`, `wink_thumbs`, `facepalm`, `phone`) are optional extras.
+
+---
+
+
 One character per account, 12 poses each, generated once and reused in every explainer Reel.
 
 ## How to do it (about 30-45 minutes total)
@@ -19,7 +41,7 @@ Waist-up character, facing the viewer (slight 3/4 is fine), centred, same size a
 illustration: clean outlines, soft cel shading, warm friendly face, expressive eyebrows and mouth, modern
 flat-but-detailed style like a premium explainer video. Portrait image, 1024x1536.
 
-## Master prompts (one per account)
+## Later: per-account master prompts (optional)
 **acc1 (founder.world1, The Blunt Operator)**
 > Create a character for an animated explainer series: an Indian man in his late 20s, short faded haircut,
 > light stubble, confident slightly smug half-smile, black hoodie with a small yellow (#FFD60A) logo dot on
