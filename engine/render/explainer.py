@@ -5,6 +5,7 @@ Script fields (format "explainer"): hook, beats [{say, emphasis, gesture, visual
 items}}], cta, music_mood. The hook and cta are spoken too. Rendered with HyperFrames.
 """
 import html
+import math
 import re
 from pathlib import Path
 
@@ -13,7 +14,8 @@ from engine.render.animated import _font_faces, render_project
 from engine.render.mascot import LOOKS, character
 
 VISUALS = ("phone_stats", "stamp", "counter", "chart", "chat", "checklist", "calendar", "cards", "versus",
-           "progress", "big_text")
+           "progress", "big_text", "headline")
+SCENES = ("paper", "ink", "accent")
 GESTURES = ("point", "explain", "shrug", "mouth", "thumbs", "celebrate", "think")
 # Accent colours that read well on paper (the account accents are tuned for dark backgrounds)
 PAPER_ACCENT = {"acc1": "#E63946", "acc2": "#C8763A", "acc3": "#1E6FD9", "acc4": "#7B2FF7", "acc5": "#D62828"}
@@ -44,7 +46,7 @@ def _caption_html(chunk: str, emphasis: list[str]) -> str:
     for w in chunk.split():
         bare = re.sub(r"[^\w']", "", w).lower()
         hot = any(bare and bare in re.sub(r"[^\w' ]", "", e).lower().split() for e in emphasis)
-        out.append(f'<span class="em">{_e(w)}</span>' if hot else _e(w))
+        out.append(f'<span class="cw{" em" if hot else ""}">{_e(w)}</span>')
     return " ".join(out)
 
 
@@ -113,6 +115,11 @@ def visual(i: int, v: dict, accent: str) -> tuple[str, list[str], float]:
         body = f'''<div class="card"><div class="pg-t">{title}</div><div class="pg"><div class="pg-f" style="width:{pct}%"></div></div>
           <div class="pg-v">{value}</div><div class="pg-l">{label}</div></div>'''
         js.append(f'tl.fromTo("#{vid} .pg-f", {{scaleX: 0}}, {{scaleX: 1, duration: 0.9, ease: "power2.out", transformOrigin: "0% 50%"}}, AT + 0.3);')
+    elif t == "headline":
+        letters = "".join(f'<span class="hl-c">{c if c != " " else "&nbsp;"}</span>' for c in html.unescape(value or title)[:18])
+        body = f'<div class="headline"><div class="hl">{letters}</div><div class="hl-u"></div><div class="hl-l">{label}</div></div>'
+        js.append(f'tl.fromTo("#{vid} .hl-c", {{opacity: 0, y: 30}}, {{opacity: 1, y: 0, duration: 0.05, stagger: 0.06}}, AT + 0.1);')
+        js.append(f'tl.fromTo("#{vid} .hl-u", {{scaleX: 0}}, {{scaleX: 1, duration: 0.4, ease: "power3.out", transformOrigin: "0% 50%"}}, AT + 0.9);')
     else:  # big_text
         body = f'<div class="bigtext"><div class="bt-v">{value or title}</div><div class="bt-l">{label}</div></div>'
         js.append(f'tl.fromTo("#{vid} .bt-v", {{scale: 0.4, opacity: 0}}, {{scale: 1, opacity: 1, duration: 0.35, ease: "back.out(2.4)"}}, AT + 0.1);')
@@ -122,6 +129,19 @@ def visual(i: int, v: dict, accent: str) -> tuple[str, list[str], float]:
               f'tl.to(o, {{n: to, duration: 0.9, ease: "power2.out", onUpdate: () => {{ el.textContent = o.n.toFixed(dec); }}}}, AT + 0.3); }} }});')
     js.insert(0, f'tl.fromTo("#{vid} > *", {{scale: 0.7, opacity: 0, y: 40}}, {{scale: 1, opacity: 1, y: 0, duration: 0.35, ease: "back.out(1.8)"}}, AT);')
     return body, js, 0.0
+
+
+CONFETTI = 26
+
+
+def _confetti(at: float) -> list[str]:
+    js = []
+    for k in range(CONFETTI):
+        dx = round(math.cos(k * 2.4) * (180 + (k * 37) % 260), 1)
+        dy = round(-260 - (k * 53) % 420, 1)
+        js.append(f'tl.fromTo("#cf{k}", {{x: 0, y: 0, opacity: 1, rotation: 0}}, {{x: {dx}, y: {dy}, rotation: {(k * 47) % 360}, '
+                  f'opacity: 0, duration: 1.3, ease: "power2.out", immediateRender: false}}, {round(at, 2)});')
+    return js
 
 
 def _gesture(name: str, at: float) -> list[str]:
@@ -158,7 +178,7 @@ def composition(post: dict, account: dict, spans: list[tuple[float, float]], tot
 
     caps, visuals, js = [], [], []
     for li, (line, (s, e)) in enumerate(zip(lines, spans)):
-        parts = chunks(line)
+        parts = chunks(line, size=4)
         total_chars = sum(len(p) for p in parts) or 1
         t = s
         for ci, part in enumerate(parts):
@@ -166,7 +186,12 @@ def composition(post: dict, account: dict, spans: list[tuple[float, float]], tot
             cid = f"c{li}_{ci}"
             caps.append(f'<div id="{cid}" class="clip cap" data-start="{round(t, 2)}" data-duration="{round(max(0.25, d), 2)}" '
                         f'data-track-index="2"><div class="cap-t">{_caption_html(part, emph[li] if li else [post["hook"].split()[-1]])}</div></div>')
-            js.append(f'tl.fromTo("#{cid} .cap-t", {{y: 24, opacity: 0}}, {{y: 0, opacity: 1, duration: 0.12, ease: "power2.out"}}, {round(t, 2)});')
+            # Each word appears as it's spoken (time split by characters within the phrase)
+            words, before = part.split(), 0
+            for wi, w in enumerate(words):
+                wt = round(t + d * before / max(1, len(part)), 2)
+                js.append(f'tl.fromTo("#{cid} .cw:nth-child({wi + 1})", {{y: 22, opacity: 0}}, {{y: 0, opacity: 1, duration: 0.1, ease: "power2.out"}}, {wt});')
+                before += len(w) + 1
             t += d
         # Mouth moves while speaking
         js += [f'tl.set(".mouth", {{opacity: 0}}, {s});', f'tl.set("#m-talk", {{opacity: 1}}, {s});',
@@ -186,16 +211,38 @@ def composition(post: dict, account: dict, spans: list[tuple[float, float]], tot
     js += [f'tl.fromTo("#vcta .ctacard", {{y: 300, opacity: 0}}, {{y: 0, opacity: 1, duration: 0.4, ease: "back.out(1.6)"}}, {cs});',
            f'tl.fromTo("#vcta .cta-save", {{scale: 2.2, opacity: 0, rotation: -18}}, {{scale: 1, opacity: 1, rotation: -6, duration: 0.25, ease: "power4.in"}}, {round(cs + 0.4, 2)});']
     js += _gesture("mouth", 0.1) + ['tl.fromTo("#mascot", {y: 600}, {y: 0, duration: 0.5, ease: "back.out(1.6)"}, 0);']
+    scenes_html, prev_scene = [], "paper"
+    scene_colors = {"paper": PAPER, "ink": INK, "accent": accent}
     for bi, beat in enumerate(post["beats"], 1):
         s, e = spans[bi]
         nxt = spans[bi + 1][0] if bi + 1 < len(spans) else total
+        scene = beat.get("scene", "paper") if beat.get("scene") in SCENES else "paper"
+        scenes_html.append(f'<div id="sc{bi}" class="clip scene" data-start="{s}" data-duration="{round(nxt - s, 2)}" '
+                           f'data-track-index="0" style="background:{scene_colors[scene]}"></div>')
+        if scene != prev_scene:  # wipe into the new scene
+            js.append(f'tl.fromTo("#sc{bi}", {{clipPath: "inset(0 0 100% 0)"}}, {{clipPath: "inset(0 0 0% 0)", duration: 0.35, ease: "power3.inOut"}}, {s});')
+        js.append(f'tl.set("#root", {{attr: {{"data-scene": "{scene}"}}}}, {s});')
+        prev_scene = scene
+        # Slow camera push-in on the illustration, with a quick glitch as it arrives
+        js.append(f'tl.fromTo("#v{bi}", {{scale: 1}}, {{scale: 1.05, duration: {round(nxt - s, 2)}, ease: "none", transformOrigin: "50% 35%"}}, {s});')
+        js.append(f'tl.fromTo("#v{bi}", {{x: -18, opacity: 0.6}}, {{x: 0, opacity: 1, duration: 0.12, ease: "steps(3)"}}, {s});')
+        if beat.get("gesture") == "celebrate":
+            js += _confetti(s + 0.2)
         body, vjs, _ = visual(bi, beat.get("visual") or {}, accent)
         visuals.append(f'<div id="v{bi}" class="clip vis" data-start="{s}" data-duration="{round(nxt - s, 2)}" data-track-index="1">{body}</div>')
         js += [x.replace("AT", str(s)) for x in vjs]
         js += _gesture(beat.get("gesture", "explain"), s)
         js.append(f'tl.set("#meta-r", {{textContent: "BEAT {bi}/{n_beats}"}}, {s});')
         js.append(f'tl.set("#meta-l", {{textContent: "// {bi:02d} · {_e(beat.get("visual", {}).get("type", "idea")).replace("_", " ")}"}}, {s});')
-    js += _gesture("celebrate", spans[-1][0])
+    js += _gesture("celebrate", spans[-1][0]) + _confetti(spans[-1][0] + 0.5)
+    scenes_html.append(f'<div id="sccta" class="clip scene" data-start="{spans[-1][0]}" data-duration="{round(total - spans[-1][0], 2)}" '
+                       f'data-track-index="0" style="background:{accent}"></div>')
+    js.append(f'tl.fromTo("#sccta", {{clipPath: "inset(0 0 100% 0)"}}, {{clipPath: "inset(0 0 0% 0)", duration: 0.35, ease: "power3.inOut"}}, {spans[-1][0]});')
+    js.append(f'tl.set("#root", {{attr: {{"data-scene": "accent"}}}}, {spans[-1][0]});')
+    js.append(f'tl.set("#meta-l", {{textContent: "// end · save this"}}, {spans[-1][0]});')
+    js.append(f'tl.set("#meta-r", {{textContent: "DONE"}}, {spans[-1][0]});')
+    js.append(f'tl.to("#grain", {{backgroundPosition: "41px 67px", duration: 0.08, ease: "steps(1)", repeat: {int(total / 0.08)}, yoyo: true}}, 0);')
+    js.append('tl.fromTo("#badge", {x: -300}, {x: 0, duration: 0.4, ease: "back.out(1.6)"}, 0.6);')
 
     fonts = "\n".join(_font_faces({"fonts": {"heading": h, "body": b}})
                       for h, b in (("DM Serif Display", "Inter"), ("JetBrains Mono", account["fonts"]["body"])))
@@ -252,6 +299,22 @@ html, body {{ width: 1080px; height: 1920px; overflow: hidden; background: {PAPE
 .pg-v {{ font-size: 90px; font-weight: 900; color: {accent}; }}
 .bigtext {{ text-align: center; }} .bt-v {{ font-size: 170px; font-weight: 900; line-height: 1; color: {INK}; }}
 .brow, .mouth, #burst {{ opacity: 0; }} #b-up, #m-happy {{ opacity: 1; }}
+.scene {{ z-index: 0; }} #world {{ z-index: 1; }} .vis {{ z-index: 2; }} .cap {{ z-index: 3; }}
+#root[data-scene="ink"] .cap-t, #root[data-scene="ink"] .meta, #root[data-scene="ink"] .handle,
+#root[data-scene="accent"] .cap-t, #root[data-scene="accent"] .meta, #root[data-scene="accent"] .handle {{ color: #fff; }}
+#root[data-scene="accent"] .em {{ color: {INK}; }} #root[data-scene="ink"] .bt-v, #root[data-scene="ink"] .hl {{ color: #fff; }}
+#grain {{ position: absolute; inset: -60px; pointer-events: none; opacity: .14; mix-blend-mode: multiply; z-index: 9;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='160' height='160' filter='url(%23n)'/></svg>"); }}
+#badge {{ position: absolute; left: 50px; bottom: 60px; display: flex; gap: 16px; align-items: center; background: #fff; border: 4px solid {INK};
+  border-radius: 20px; padding: 14px 20px; box-shadow: 6px 6px 0 {accent}; z-index: 4; }}
+.bd-m {{ width: 56px; height: 56px; border-radius: 14px; background: {accent}; color: #fff; font-weight: 900; font-size: 34px;
+  display: flex; align-items: center; justify-content: center; }}
+.bd-t {{ font-family: 'JetBrains Mono', monospace; font-size: 22px; font-weight: 700; line-height: 1.3; color: {INK}; }} .bd-t span {{ opacity: .55; font-weight: 400; }}
+#confetti {{ position: absolute; right: 320px; bottom: 700px; z-index: 5; }} .cf {{ position: absolute; width: 18px; height: 26px; border-radius: 4px; opacity: 0; }}
+.cw {{ display: inline-block; }}
+.headline {{ text-align: center; }} .hl {{ font-size: 150px; font-weight: 900; letter-spacing: -0.02em; line-height: 1; color: {INK}; }}
+.hl-c {{ display: inline-block; }} .hl-u {{ height: 18px; background: {accent}; margin: 18px auto 0; width: 80%; border-radius: 10px; }}
+.hl-l {{ font-size: 36px; color: #777; margin-top: 22px; }}
 .hookmark {{ font-family: 'DM Serif Display', serif; font-style: italic; font-size: 420px; line-height: 1; color: {accent}; margin-top: 40px; }}
 .ctacard {{ background: {INK}; color: #fff; border-radius: 34px; padding: 60px 70px; text-align: center; box-shadow: 12px 12px 0 {accent}; margin-top: 60px; }}
 .cta-save {{ display: inline-block; border: 8px solid {accent}; color: {accent}; font-weight: 900; font-size: 96px; padding: 8px 30px;
@@ -259,10 +322,14 @@ html, body {{ width: 1080px; height: 1920px; overflow: hidden; background: {PAPE
 .cta-f {{ margin-top: 36px; font-size: 46px; }} .cta-f b {{ color: {accent}; }}
 '''
     body = f'''<div id="root" data-composition-id="main" data-start="0" data-duration="{total}" data-width="1080" data-height="1920">
+  {"".join(scenes_html)}
   <div id="world" class="clip" data-start="0" data-duration="{total}" data-track-index="0">
     <div id="meta-l" class="meta">// 00 · hook</div><div class="handle">@{_e(account["handle"])}</div>
     <div id="meta-r" class="meta">BEAT 0/{n_beats}</div>
-    <div id="stage">{character(look)}</div></div>
+    <div id="stage">{character(look)}</div>
+    <div id="badge"><div class="bd-m">{_e(account["handle"][:1].upper())}</div><div class="bd-t">@{_e(account["handle"])}<br><span>founder notes</span></div></div>
+    <div id="confetti">{"".join(f'<i id="cf{k}" class="cf" style="background:{[accent, INK, "#FFD60A", "#fff"][k % 4]}"></i>' for k in range(CONFETTI))}</div>
+    <div id="grain"></div></div>
   {"".join(visuals)}{"".join(caps)}
   <audio id="vo" data-start="0" data-duration="{total}" data-track-index="8" data-volume="1" src="assets/voice.wav"></audio>
   <audio id="music" data-start="0" data-duration="{total}" data-track-index="9" data-volume="0.12" src="assets/music.mp3"></audio>

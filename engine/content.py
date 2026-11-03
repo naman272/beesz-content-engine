@@ -82,7 +82,9 @@ FORMAT_GUIDES = {
         "one UI-style illustration that shows the beat: phone_stats (a profile/stats screen: title, value, label), "
         "stamp (a document stamped with value), counter (a big number counting up), chart (a rising line with "
         "value), chat (an AI/chat box typing title), checklist (items), calendar (value like NOW or a day), cards "
-        "(items stacked), versus (items = [before, after]), progress (value as a percent), big_text (value). Keep "
+        "(items stacked), versus (items = [before, after]), progress (value as a percent), big_text (value), headline "
+        "(a 1-3 word phrase typed in big, e.g. EVERY KIND). scene = the background: paper for most beats, ink (dark) "
+        "for the problem or myth section, accent for the payoff; change scene only 2-3 times per Reel. Keep "
         "visual text very short (value max 12 chars, items max 6 words). Vary the visuals across beats. "
         "Limits: hook {hook}, each say {say}, cta {cta}."
     )
@@ -232,12 +234,13 @@ def post_schema(fmt: str) -> dict:
         post = _obj({**common, "pairs": {"type": "array", "items": pair},
                      "music_mood": {"type": "string", "enum": assets.music_moods()}, **tail})
     elif fmt == "explainer":
-        from engine.render.explainer import GESTURES, VISUALS
+        from engine.render.explainer import GESTURES, SCENES, VISUALS
         vis = _obj({"type": {"type": "string", "enum": list(VISUALS)}, "title": {"type": "string"},
                     "value": {"type": "string"}, "label": {"type": "string"},
                     "items": {"type": "array", "items": {"type": "string"}}})
         beat = _obj({"say": {"type": "string"}, "emphasis": {"type": "string"},
-                     "gesture": {"type": "string", "enum": list(GESTURES)}, "visual": vis})
+                     "gesture": {"type": "string", "enum": list(GESTURES)}, "scene": {"type": "string", "enum": list(SCENES)},
+                     "visual": vis})
         post = _obj({**common, "beats": {"type": "array", "items": beat},
                      "music_mood": {"type": "string", "enum": assets.music_moods()}, **tail})
     elif fmt == "checklist":

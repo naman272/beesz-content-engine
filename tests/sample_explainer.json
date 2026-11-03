@@ -8,12 +8,13 @@
       "emphasis": "ads",
       "gesture": "point",
       "visual": {
-        "type": "big_text",
+        "type": "headline",
         "title": "",
         "value": "STOP ADS",
-        "label": "",
+        "label": "until someone pays",
         "items": []
-      }
+      },
+      "scene": "paper"
     },
     {
       "say": "Write down a list of people who have the exact problem you solve, by name, not by audience type.",
@@ -30,7 +31,8 @@
           "LinkedIn contacts",
           "Local businesses"
         ]
-      }
+      },
+      "scene": "paper"
     },
     {
       "say": "Message them one by one, not a broadcast, and ask about their problem before you pitch anything.",
@@ -42,7 +44,8 @@
         "value": "",
         "label": "",
         "items": []
-      }
+      },
+      "scene": "ink"
     },
     {
       "say": "If they describe the pain in their own words, ask for a short call that same week.",
@@ -54,12 +57,13 @@
         "value": "THIS WEEK",
         "label": "",
         "items": []
-      }
+      },
+      "scene": "ink"
     },
     {
       "say": "On the call, ask them to pay or prepay something, because 'sounds cool' isn't a customer.",
       "emphasis": "pay",
-      "gesture": "shrug",
+      "gesture": "celebrate",
       "visual": {
         "type": "versus",
         "title": "Real signal",
@@ -69,7 +73,8 @@
           "Sounds cool",
           "Paid via UPI"
         ]
-      }
+      },
+      "scene": "paper"
     },
     {
       "say": "Track every message, reply and payment in one simple sheet so you can see which line actually works.",
@@ -86,7 +91,8 @@
           "Called",
           "Paid"
         ]
-      }
+      },
+      "scene": "paper"
     },
     {
       "say": "Once people pay, call them and ask why they bought, then copy their exact words into your pitch.",
@@ -98,7 +104,8 @@
         "value": "WHY?",
         "label": "Use their words",
         "items": []
-      }
+      },
+      "scene": "accent"
     }
   ],
   "music_mood": "calm",
