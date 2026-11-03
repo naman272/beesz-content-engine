@@ -24,3 +24,12 @@ account. 15% of each account's format mix; also allowed for breakdowns, India gu
    `engine/render/explainer.py`.
 4. Presenter: extend `engine/render/mascot.py` with gesture poses in the flat black/accent style.
 5. Sample to Telegram for approval; then add `explainer` to `format_mix_next` and KIND_FORMATS.
+
+## v2 upgrade (owner's second reference, target: live in the 15 Nov plan)
+Week 1 (to 7 Nov, code only): story-driven scene themes (paper / ink / accent backgrounds per section),
+grain texture, camera zoom/pan, wipe + glitch transitions, confetti on wins, word-by-word captions synced
+to the voice, typed headline moments with animated underline, ~10 realistic mockups (editor timeline,
+terminal, folder, comments, browser, notification stack, app-store card, invoice, calendar invite, bank
+statement) layered 2-3 per beat with depth, persistent brand badge. Sample to owner by Friday.
+Week 2 (8-14 Nov): detailed illustrated character per account with ~12 poses (owner generates them in
+ChatGPT using docs/character-prompts.md), swapped per beat with bounce/squash; polish; live 15 Nov.
