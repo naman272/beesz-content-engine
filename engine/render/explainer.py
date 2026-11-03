@@ -14,7 +14,8 @@ from engine.render.animated import _font_faces, render_project
 from engine.render.mascot import LOOKS, character
 
 VISUALS = ("phone_stats", "stamp", "counter", "chart", "chat", "checklist", "calendar", "cards", "versus",
-           "progress", "big_text", "headline")
+           "progress", "big_text", "headline", "editor", "terminal", "folder", "comments", "browser",
+           "notifications", "app_card", "invoice", "invite", "bank")
 SCENES = ("paper", "ink", "accent")
 GESTURES = ("point", "explain", "shrug", "mouth", "thumbs", "celebrate", "think")
 # Accent colours that read well on paper (the account accents are tuned for dark backgrounds)
@@ -116,10 +117,71 @@ def visual(i: int, v: dict, accent: str) -> tuple[str, list[str], float]:
           <div class="pg-v">{value}</div><div class="pg-l">{label}</div></div>'''
         js.append(f'tl.fromTo("#{vid} .pg-f", {{scaleX: 0}}, {{scaleX: 1, duration: 0.9, ease: "power2.out", transformOrigin: "0% 50%"}}, AT + 0.3);')
     elif t == "headline":
-        letters = "".join(f'<span class="hl-c">{c if c != " " else "&nbsp;"}</span>' for c in html.unescape(value or title)[:18])
-        body = f'<div class="headline"><div class="hl">{letters}</div><div class="hl-u"></div><div class="hl-l">{label}</div></div>'
+        phrase = html.unescape(value or title)[:18]
+        # Letters animate one by one, but each word stays on one line; long phrases get a smaller size
+        words_html = " ".join('<span class="hl-w">' + "".join(f'<span class="hl-c">{html.escape(c)}</span>' for c in w) + "</span>"
+                              for w in phrase.split())
+        size = 150 if len(phrase) <= 9 else 118 if len(phrase) <= 13 else 96
+        body = f'<div class="headline"><div class="hl" style="font-size:{size}px">{words_html}</div><div class="hl-u"></div><div class="hl-l">{label}</div></div>'
         js.append(f'tl.fromTo("#{vid} .hl-c", {{opacity: 0, y: 30}}, {{opacity: 1, y: 0, duration: 0.05, stagger: 0.06}}, AT + 0.1);')
         js.append(f'tl.fromTo("#{vid} .hl-u", {{scaleX: 0}}, {{scaleX: 1, duration: 0.4, ease: "power3.out", transformOrigin: "0% 50%"}}, AT + 0.9);')
+    elif t == "editor":  # video/doc editor timeline with a red error toast
+        tracks = "".join(f'<div class="ed-tr"><span>V{k + 1}</span>' + "".join(
+            f'<i style="width:{40 + (k * 31 + j * 17) % 90}px;background:{accent if (k + j) % 3 == 0 else "#2a2a2a"}"></i>'
+            for j in range(6)) + "</div>" for k in range(5))
+        body = (f'<div class="win dark"><div class="win-bar"><b></b><b></b><b></b><span>{title or "edit · final_v7"}</span></div>'
+                f'<div class="ed">{tracks}<div class="ed-head"></div></div>'
+                f'<div class="toast">&#10005; {value or "render failed"}<small>{label}</small></div></div>')
+        js.append(f'tl.fromTo("#{vid} .ed-head", {{x: 0}}, {{x: 560, duration: 1.4, ease: "none"}}, AT + 0.2);')
+        js.append(f'tl.fromTo("#{vid} .toast", {{scale: 0, opacity: 0}}, {{scale: 1, opacity: 1, duration: 0.25, ease: "back.out(3)"}}, AT + 1.0);')
+    elif t == "terminal":
+        cmds = items or [title or "make a reel about why"]
+        body = (f'<div class="win term"><div class="win-bar"><b></b><b></b><b></b><span>{label or "~/startup"}</span></div>'
+                + "".join(f'<div class="tm-l"><span class="tm-p">&gt;</span> <span class="tm-t">{x}</span></div>' for x in cmds)
+                + f'<div class="tm-l ok">&#10003; {value or "done"}</div></div>')
+        js.append(f'tl.fromTo("#{vid} .tm-t", {{clipPath: "inset(0 100% 0 0)"}}, {{clipPath: "inset(0 0% 0 0)", duration: 0.6, stagger: 0.5, ease: "none"}}, AT + 0.2);')
+        js.append(f'tl.fromTo("#{vid} .ok", {{opacity: 0}}, {{opacity: 1, duration: 0.2}}, AT + {round(0.4 + 0.5 * len(cmds), 2)});')
+    elif t == "folder":
+        files = "".join(f'<div class="fl-f" style="transform:rotate({(k - 1) * 7}deg)">{x}</div>' for k, x in enumerate(items[:3] or [value]))
+        body = (f'<div class="folder"><div class="fl-tab">{label or "startup-kit"}</div><div class="fl-files">{files}</div>'
+                f'<div class="fl-front"><div class="fl-name">{title or "ONE FOLDER"}</div><div class="fl-sub">{value}</div></div></div>')
+        js.append(f'tl.fromTo("#{vid} .fl-f", {{y: 160, opacity: 0}}, {{y: 0, opacity: 1, duration: 0.35, stagger: 0.15, ease: "back.out(1.6)"}}, AT + 0.3);')
+    elif t == "comments":
+        rows = "".join(f'<div class="cm"><span class="cm-a" style="background:{[accent, INK, "#888"][k % 3]}"></span>'
+                       f'<div><b>founder_{k + 1:02d}</b><br>{x}</div><span class="cm-heart">&#9829;</span></div>'
+                       for k, x in enumerate(items or [value or "this is insane"]))
+        body = f'<div class="card cmts"><div class="cm-h">{title or "Comments"}</div>{rows}</div>'
+        js.append(f'tl.fromTo("#{vid} .cm", {{x: 80, opacity: 0}}, {{x: 0, opacity: 1, duration: 0.3, stagger: 0.3}}, AT + 0.2);')
+        js.append(f'tl.fromTo("#{vid} .cm-heart", {{scale: 0}}, {{scale: 1, duration: 0.2, stagger: 0.3, ease: "back.out(4)"}}, AT + 0.5);')
+    elif t == "browser":
+        body = (f'<div class="win"><div class="win-bar light"><b></b><b></b><b></b><span class="url">{label or "yourstartup.com"}</span></div>'
+                f'<div class="br"><div class="br-h">{title or "Your headline here"}</div><div class="br-l"></div><div class="br-l short"></div>'
+                f'<div class="br-btn">{value or "Get started"}</div></div></div>')
+        js.append(f'tl.fromTo("#{vid} .br-btn", {{scale: 1}}, {{scale: 1.12, duration: 0.18, repeat: 3, yoyo: true}}, AT + 0.8);')
+    elif t == "notifications":
+        body = '<div class="notifs">' + "".join(
+            f'<div class="nt"><span class="nt-i" style="background:{accent if k == 0 else INK}">{(title or "A")[:1]}</span>'
+            f'<div><b>{title or "App"}</b> · now<br>{x}</div></div>' for k, x in enumerate(items or [value or "New message"])) + "</div>"
+        js.append(f'tl.fromTo("#{vid} .nt", {{y: -120, opacity: 0}}, {{y: 0, opacity: 1, duration: 0.3, stagger: 0.35, ease: "back.out(1.6)"}}, AT + 0.1);')
+    elif t == "app_card":
+        body = (f'<div class="card app"><div class="ap-i">{(title or "A")[:1]}</div><div class="ap-n">{title or "Your app"}</div>'
+                f'<div class="ap-r">&#9733;&#9733;&#9733;&#9733;&#9733; <span>{value}</span></div><div class="ap-l">{label}</div><div class="ap-btn">GET</div></div>')
+        js.append(f'tl.fromTo("#{vid} .ap-btn", {{scale: 0}}, {{scale: 1, duration: 0.3, ease: "back.out(3)"}}, AT + 0.6);')
+    elif t == "invoice":
+        rows = "".join(f'<div class="iv-r"><span>{x}</span><span class="iv-d"></span></div>' for x in items[:4])
+        body = (f'<div class="card doc iv"><div class="iv-h"><b>INVOICE</b><span>{label or "#0042"}</span></div>'
+                f'<div class="iv-to">{title}</div>{rows}<div class="iv-t">{value}</div><div class="stampmark">PAID</div></div>')
+        js.append(f'tl.fromTo("#{vid} .stampmark", {{scale: 2.6, opacity: 0, rotation: -24}}, {{scale: 1, opacity: 1, rotation: -12, duration: 0.22, ease: "power4.in"}}, AT + 0.9);')
+    elif t == "invite":
+        body = (f'<div class="card inv"><div class="inv-top"><span class="inv-day">{value or "MON"}</span>'
+                f'<div><b>{title or "Customer call"}</b><br>{label or "30 min · Google Meet"}</div></div>'
+                f'<div class="inv-btns"><span class="yes">&#10003; Accept</span><span>Maybe</span><span>Decline</span></div></div>')
+        js.append(f'tl.fromTo("#{vid} .yes", {{scale: 1}}, {{scale: 1.1, backgroundColor: "{accent}", color: "#fff", duration: 0.25}}, AT + 0.9);')
+    elif t == "bank":
+        rows = "".join(f'<div class="bk-r"><span>{x}</span><b class="neg">&minus;</b></div>' for x in items[:4])
+        body = (f'<div class="card bank"><div class="bk-h">{title or "Account"}</div><div class="bk-b">{value}</div>'
+                f'<div class="bk-l">{label or "balance"}</div>{rows}</div>')
+        js.append(f'tl.fromTo("#{vid} .bk-r", {{opacity: 0, x: -40}}, {{opacity: 1, x: 0, duration: 0.25, stagger: 0.25}}, AT + 0.5);')
     else:  # big_text
         body = f'<div class="bigtext"><div class="bt-v">{value or title}</div><div class="bt-l">{label}</div></div>'
         js.append(f'tl.fromTo("#{vid} .bt-v", {{scale: 0.4, opacity: 0}}, {{scale: 1, opacity: 1, duration: 0.35, ease: "back.out(2.4)"}}, AT + 0.1);')
@@ -127,7 +189,8 @@ def visual(i: int, v: dict, accent: str) -> tuple[str, list[str], float]:
     js.append(f'document.querySelectorAll("#{vid} .count").forEach(el => {{ const to = parseFloat(el.dataset.to); '
               f'if (!isNaN(to)) {{ const o = {{n: 0}}; const dec = (String(el.dataset.to).split(".")[1] || "").length; '
               f'tl.to(o, {{n: to, duration: 0.9, ease: "power2.out", onUpdate: () => {{ el.textContent = o.n.toFixed(dec); }}}}, AT + 0.3); }} }});')
-    js.insert(0, f'tl.fromTo("#{vid} > *", {{scale: 0.7, opacity: 0, y: 40}}, {{scale: 1, opacity: 1, y: 0, duration: 0.35, ease: "back.out(1.8)"}}, AT);')
+    js.insert(0, f'tl.fromTo("#{vid} > *", {{scale: 0.7, opacity: 0, y: 40, rotationX: 18, rotationY: -12}}, {{scale: 1, opacity: 1, y: 0, '
+                 f'rotationX: 4, rotationY: -4, duration: 0.45, ease: "back.out(1.6)", transformPerspective: 1400}}, AT);')
     return body, js, 0.0
 
 
@@ -261,9 +324,9 @@ html, body {{ width: 1080px; height: 1920px; overflow: hidden; background: {PAPE
   letter-spacing: -0.02em; font-family: 'Inter', sans-serif; }}
 .em {{ color: {accent}; font-family: 'DM Serif Display', serif; font-style: italic; font-weight: 400; }}
 #stage {{ position: absolute; right: -40px; bottom: -150px; transform: scale(.82); transform-origin: bottom right; }}
-.vis {{ display: flex; align-items: flex-start; justify-content: center; padding-top: 450px; }}
+.vis {{ display: flex; align-items: center; justify-content: center; padding: 380px 0 640px; }}
 .vis > * {{ max-width: 900px; transform-origin: 50% 0%; }}
-.vis .card, .vis .stack, .vis .cal {{ zoom: 1.12; }}
+.vis .card, .vis .stack, .vis .cal, .vis .win, .vis .notifs {{ zoom: 1.12; }} .vis .folder {{ zoom: 1.3; }}
 .vis .vs {{ zoom: 1.05; width: 880px; }}
 .card {{ background: #fff; border: 5px solid {INK}; border-radius: 30px; padding: 40px 46px; box-shadow: 10px 10px 0 {INK}; width: 760px; }}
 .phone {{ width: 430px; height: 760px; background: {INK}; border-radius: 60px; padding: 70px 34px 34px; position: relative; color: #fff; box-shadow: 12px 12px 0 {accent}; }}
@@ -312,8 +375,50 @@ html, body {{ width: 1080px; height: 1920px; overflow: hidden; background: {PAPE
 .bd-t {{ font-family: 'JetBrains Mono', monospace; font-size: 22px; font-weight: 700; line-height: 1.3; color: {INK}; }} .bd-t span {{ opacity: .55; font-weight: 400; }}
 #confetti {{ position: absolute; right: 320px; bottom: 700px; z-index: 5; }} .cf {{ position: absolute; width: 18px; height: 26px; border-radius: 4px; opacity: 0; }}
 .cw {{ display: inline-block; }}
+.win {{ width: 860px; background: #fff; border: 5px solid {INK}; border-radius: 26px; overflow: hidden; box-shadow: 12px 12px 0 {INK}; position: relative; }}
+.win.dark, .win.term {{ background: #141414; color: #eee; }}
+.win-bar {{ height: 64px; background: #1f1f1f; display: flex; align-items: center; gap: 12px; padding: 0 22px; color: #aaa;
+  font-family: 'JetBrains Mono', monospace; font-size: 22px; }} .win-bar.light {{ background: #ECEAE5; color: #555; }}
+.win-bar b {{ width: 18px; height: 18px; border-radius: 50%; background: #555; }} .win-bar b:first-child {{ background: {accent}; }}
+.win-bar span {{ margin-left: 14px; }} .url {{ background: #fff; border-radius: 10px; padding: 4px 18px; flex: 1; }}
+.ed {{ padding: 26px; position: relative; }} .ed-tr {{ display: flex; gap: 8px; align-items: center; margin: 12px 0; font-family: 'JetBrains Mono', monospace; font-size: 20px; color: #777; }}
+.ed-tr span {{ width: 40px; }} .ed-tr i {{ height: 30px; border-radius: 6px; display: inline-block; }}
+.ed-head {{ position: absolute; top: 14px; bottom: 14px; left: 80px; width: 4px; background: {accent}; }}
+.toast {{ position: absolute; right: 40px; top: 110px; background: {accent}; color: #fff; font-weight: 800; font-size: 34px; padding: 18px 26px; border-radius: 16px;
+  box-shadow: 0 14px 30px rgba(0,0,0,.35); }} .toast small {{ display: block; font-size: 22px; font-weight: 500; opacity: .85; }}
+.term {{ padding-bottom: 24px; }} .tm-l {{ font-family: 'JetBrains Mono', monospace; font-size: 34px; padding: 14px 30px; }} .tm-p {{ color: {accent}; }}
+.tm-l.ok {{ color: #4ade80; }}
+.folder {{ width: 640px; height: 520px; position: relative; }} .fl-tab {{ position: absolute; top: 0; left: 40px; background: {accent}; color: #fff;
+  font-family: 'JetBrains Mono', monospace; font-size: 22px; padding: 10px 22px; border-radius: 14px 14px 0 0; }}
+.fl-files {{ position: absolute; top: 40px; left: 60px; right: 60px; height: 260px; }} .fl-f {{ position: absolute; left: 20%; width: 60%; background: #fff;
+  border: 4px solid {INK}; border-radius: 14px; padding: 18px; font-size: 26px; font-weight: 700; box-shadow: 6px 6px 0 {INK}; }}
+.fl-f:nth-child(1) {{ left: 4%; }} .fl-f:nth-child(3) {{ left: 36%; }}
+.fl-front {{ position: absolute; bottom: 0; left: 0; right: 0; height: 300px; background: #fff; border: 5px solid {INK}; border-radius: 26px;
+  box-shadow: 12px 12px 0 {accent}; display: flex; flex-direction: column; justify-content: center; padding: 0 44px; }}
+.fl-name {{ font-size: 70px; font-weight: 900; color: {INK}; }} .fl-sub {{ font-size: 28px; color: #777; }}
+.cmts .cm-h {{ font-size: 34px; font-weight: 800; margin-bottom: 18px; }} .cm {{ display: flex; gap: 18px; align-items: center; font-size: 30px; margin: 18px 0; }}
+.cm-a {{ width: 56px; height: 56px; border-radius: 50%; flex: none; }} .cm b {{ font-size: 24px; color: #777; }} .cm-heart {{ margin-left: auto; color: {accent}; font-size: 36px; }}
+.br {{ padding: 50px; }} .br-h {{ font-size: 56px; font-weight: 900; color: {INK}; margin-bottom: 26px; }}
+.br-l {{ height: 22px; background: #E4E1DA; border-radius: 10px; margin: 14px 0; }} .br-l.short {{ width: 60%; }}
+.br-btn {{ display: inline-block; margin-top: 30px; background: {accent}; color: #fff; font-weight: 800; font-size: 34px; padding: 18px 36px; border-radius: 16px; }}
+.notifs {{ width: 820px; }} .nt {{ display: flex; gap: 20px; align-items: center; background: rgba(255,255,255,.96); border: 4px solid {INK}; border-radius: 26px;
+  padding: 22px 26px; margin-bottom: 18px; font-size: 30px; color: {INK}; box-shadow: 6px 6px 0 {INK}; }} .nt b {{ font-size: 26px; }}
+.nt-i {{ width: 64px; height: 64px; border-radius: 16px; color: #fff; font-weight: 900; font-size: 32px; display: flex; align-items: center; justify-content: center; flex: none; }}
+.app {{ text-align: center; }} .ap-i {{ width: 150px; height: 150px; margin: 0 auto 20px; border-radius: 36px; background: {accent}; color: #fff; font-size: 90px;
+  font-weight: 900; display: flex; align-items: center; justify-content: center; }} .ap-n {{ font-size: 50px; font-weight: 900; }}
+.ap-r {{ color: #F5B700; font-size: 36px; margin: 10px 0; }} .ap-r span {{ color: #555; font-size: 28px; }} .ap-l {{ font-size: 28px; color: #777; }}
+.ap-btn {{ display: inline-block; margin-top: 24px; background: {INK}; color: #fff; font-weight: 900; font-size: 32px; padding: 14px 50px; border-radius: 40px; }}
+.iv-h {{ display: flex; justify-content: space-between; font-family: 'JetBrains Mono', monospace; font-size: 30px; }}
+.iv-to {{ font-size: 34px; font-weight: 700; margin: 20px 0; }} .iv-r {{ display: flex; gap: 14px; align-items: center; font-size: 28px; margin: 12px 0; color: #555; }}
+.iv-d {{ flex: 1; border-bottom: 3px dotted #bbb; }} .iv-t {{ font-size: 64px; font-weight: 900; text-align: right; margin-top: 16px; }}
+.inv-top {{ display: flex; gap: 26px; align-items: center; font-size: 32px; }}
+.inv-day {{ background: {accent}; color: #fff; font-weight: 900; font-size: 38px; padding: 22px 20px; border-radius: 18px; }}
+.inv-btns {{ display: flex; gap: 16px; margin-top: 30px; }} .inv-btns span {{ border: 4px solid {INK}; border-radius: 14px; padding: 12px 24px; font-size: 28px; font-weight: 700; }}
+.iv .stampmark {{ top: 90px; bottom: auto; right: 34px; font-size: 60px; }}
+.bk-h {{ font-size: 32px; color: #777; }} .bk-b {{ font-size: 90px; font-weight: 900; }} .bk-l {{ font-size: 26px; color: #999; margin-bottom: 20px; }}
+.bk-r {{ display: flex; justify-content: space-between; font-size: 30px; padding: 14px 0; border-top: 2px solid #eee; }} .neg {{ color: {accent}; }}
 .headline {{ text-align: center; }} .hl {{ font-size: 150px; font-weight: 900; letter-spacing: -0.02em; line-height: 1; color: {INK}; }}
-.hl-c {{ display: inline-block; }} .hl-u {{ height: 18px; background: {accent}; margin: 18px auto 0; width: 80%; border-radius: 10px; }}
+.hl-c {{ display: inline-block; }} .hl-w {{ display: inline-block; white-space: nowrap; }} .hl-u {{ height: 18px; background: {accent}; margin: 18px auto 0; width: 80%; border-radius: 10px; }}
 .hl-l {{ font-size: 36px; color: #777; margin-top: 22px; }}
 .hookmark {{ font-family: 'DM Serif Display', serif; font-style: italic; font-size: 420px; line-height: 1; color: {accent}; margin-top: 40px; }}
 .ctacard {{ background: {INK}; color: #fff; border-radius: 34px; padding: 60px 70px; text-align: center; box-shadow: 12px 12px 0 {accent}; margin-top: 60px; }}

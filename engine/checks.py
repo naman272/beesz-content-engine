@@ -98,6 +98,9 @@ def check_post(post: dict, fmt: str = "carousel", recent_hooks: list[str] = (),
     elif fmt == "explainer":
         if not 5 <= len(post["beats"]) <= 7:
             problems.append(f"needs 5-7 beats, got {len(post['beats'])}")
+        spoken = " ".join([post["hook"], *[b["say"] for b in post["beats"]], post["cta"]]).split()
+        if len(spoken) > limits["words"]:
+            problems.append(f"script too long to narrate in ~45s ({len(spoken)} words > {limits['words']})")
         for i, b in enumerate(post["beats"], 1):
             _too_long(problems, f"beat {i}", b["say"], limits["say"])
             if len(str((b.get("visual") or {}).get("value", ""))) > 14:

@@ -30,7 +30,7 @@ LIMITS = {
     "chat": {"hook": 60, "message": 90, "cta": 60, "caption": 1500, "role": 20},
     "myth_fact": {"hook": 60, "myth": 80, "fact": 110, "cta": 60, "caption": 1500},
     "checklist": {"hook": 60, "item": 60, "cta": 60, "caption": 1500},
-    "explainer": {"hook": 70, "say": 150, "cta": 80, "caption": 1500},
+    "explainer": {"hook": 70, "say": 110, "cta": 70, "caption": 1500, "words": 120},
 }
 
 # Every non-carousel format is a Reel
@@ -77,13 +77,19 @@ FORMAT_GUIDES = {
     ),
     "explainer": (
         "NARRATED EXPLAINER REEL (30-45 seconds, spoken by a voiceover): the hook is said first, then 5-7 beats, "
-        "then the CTA is said. Each beat 'say' is ONE natural spoken sentence (how a person talks, contractions "
+        "then the CTA is said. The whole script (hook + every say + cta) must be under 120 words. Each beat 'say' is ONE short natural spoken sentence (how a person talks, contractions "
         "welcome). emphasis = 1-2 words from that sentence to highlight. gesture = the presenter's move. visual = "
         "one UI-style illustration that shows the beat: phone_stats (a profile/stats screen: title, value, label), "
         "stamp (a document stamped with value), counter (a big number counting up), chart (a rising line with "
         "value), chat (an AI/chat box typing title), checklist (items), calendar (value like NOW or a day), cards "
         "(items stacked), versus (items = [before, after]), progress (value as a percent), big_text (value), headline "
-        "(a 1-3 word phrase typed in big, e.g. EVERY KIND). scene = the background: paper for most beats, ink (dark) "
+        "(a 1-3 word phrase typed in big, e.g. EVERY KIND), editor (a video/doc editor timeline with an error toast: title, "
+        "value = error), terminal (items = typed commands, value = result), folder (title, value, items = files), comments "
+        "(items = comments), browser (a website: title = headline, value = button, label = url), notifications (title = app, "
+        "items = notification texts), app_card (title = app name, value = rating text, label), invoice (title = client, items = "
+        "line items, value = total), invite (a calendar invite: title, value = day, label), bank (title, value = balance, items = "
+        "spends). Prefer the realistic mockups (editor, terminal, folder, comments, browser, notifications, app_card, invoice, "
+        "invite, bank) for most beats. scene = the background: paper for most beats, ink (dark) "
         "for the problem or myth section, accent for the payoff; change scene only 2-3 times per Reel. Keep "
         "visual text very short (value max 12 chars, items max 6 words). Vary the visuals across beats. "
         "Limits: hook {hook}, each say {say}, cta {cta}."
