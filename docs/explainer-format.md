@@ -22,7 +22,7 @@ account. 15% of each account's format mix; also allowed for breakdowns, India gu
    visual: {type, params}, gesture}; cta. Opus writes it and picks visuals from the library.
 3. Illustration library: one HTML/SVG/GSAP component per visual type, account palette.
    `engine/render/explainer.py`.
-4. Presenter: extend `engine/render/mascot.py` with gesture poses in the flat black/accent style.
+4. Presenter: illustrated character, one PNG per pose (`engine/render/presenter.py`). The old vector mascot was removed (owner: never use it).
 5. Sample to Telegram for approval; then add `explainer` to `format_mix_next` and KIND_FORMATS.
 
 ## v2 upgrade (owner's second reference, target: live in the 15 Nov plan)

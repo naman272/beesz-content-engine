@@ -2,7 +2,7 @@
 
 **Start: one shared character for all 5 accounts, 8 poses (8 images).** Per-account characters can come later
 (their master prompts are kept below); the renderer uses `assets/characters/<account>/` if it exists, else
-`assets/characters/shared/`, and falls back to the current mascot for any missing pose.
+`assets/characters/shared/`; a missing pose falls back to another pose of the same character (never the old vector mascot, which was removed).
 
 ## Quick start (about 15 minutes)
 1. Open a new ChatGPT chat and paste the **shared master prompt** below. Regenerate until you like him.

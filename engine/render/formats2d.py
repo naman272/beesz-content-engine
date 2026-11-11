@@ -1,8 +1,8 @@
 """2D animated Reel formats rendered with HyperFrames (HTML + SVG + GSAP -> MP4):
 
 - chat:       an animated DM conversation (You <-> an investor/mentor/customer), typing dots, bubbles popping in
-- myth_fact:  a MYTH card gets a red X stamp, then the FACT slides in with a green tick; the mascot reacts
-- checklist:  a clipboard where each item gets ticked off while the mascot points along
+- myth_fact:  a MYTH card gets a red X stamp, then the FACT slides in with a green tick; the presenter reacts
+- checklist:  a clipboard where each item gets ticked off while the presenter reacts
 """
 import html
 import math
@@ -10,7 +10,7 @@ from pathlib import Path
 
 from engine.render.animated import _font_faces, _read_time, _size, _words, render_project
 from engine.render.carousel import _theme
-from engine.render.mascot import FACES, LOOKS, character
+from engine.render import presenter
 
 FORMATS = ("chat", "myth_fact", "checklist")
 
@@ -70,19 +70,17 @@ def _cta(post: dict, account: dict, start: float, total: float) -> tuple[str, li
     return el, js
 
 
-def _face_css(name: str) -> str:
-    brow, mouth = FACES[name]
-    return f"#{brow}, #{mouth} {{ opacity: 1; }}"
+# The presenter stands out on any background with a light outline
+PRESENTER_GLOW = "#presenter { filter: drop-shadow(0 0 3px rgba(255,255,255,.85)) drop-shadow(0 0 20px rgba(255,255,255,.2)); }"
 
 
-def _face(name: str, at: float) -> list[str]:
-    brow, mouth = FACES[name]
-    return [f'tl.set(".brow, .mouth", {{opacity: 0}}, {at});', f'tl.set("#{brow}, #{mouth}", {{opacity: 1}}, {at});']
+def _idle(total: float) -> str:
+    return f'tl.to("#presenter-bob", {{y: -10, duration: 0.9, repeat: {int(total / 0.9)}, yoyo: true, ease: "sine.inOut"}}, 0);'
 
 
 # ---------- chat ----------
 
-def chat(post: dict, account: dict) -> tuple[str, float]:
+def chat(post: dict, account: dict, poses: dict | None = None) -> tuple[str, float]:
     t = _theme(account)
     msgs = post["messages"]
     hook_t = _read_time(post["hook"], 2.0, 3.0)
@@ -149,15 +147,13 @@ def chat(post: dict, account: dict) -> tuple[str, float]:
 
 # ---------- myth vs fact ----------
 
-def myth_fact(post: dict, account: dict) -> tuple[str, float]:
-    look = LOOKS.get(account["id"], LOOKS["acc1"])
+def myth_fact(post: dict, account: dict, poses: dict) -> tuple[str, float]:
     hook_t = _read_time(post["hook"], 2.2, 3.2)
     scenes, js, cursor = [], [], hook_t
     js += ['tl.fromTo("#hook .w", {y: 70, opacity: 0, scale: 0.6}, {y: 0, opacity: 1, scale: 1, duration: 0.32, stagger: 0.06, '
            'ease: "back.out(2.2)"}, 0);',
            f'tl.to("#hook", {{opacity: 0, y: -60, duration: 0.25}}, {round(hook_t - 0.25, 2)});',
-           'tl.fromTo("#mascot", {y: 500}, {y: 0, duration: 0.45, ease: "back.out(1.8)"}, 0);',
-           f'tl.to("#body", {{y: -10, duration: 0.9, repeat: 40, yoyo: true, ease: "sine.inOut"}}, 0);']
+           *presenter.enter(0), *presenter.pose("mouth", 0, poses)]
     for i, p in enumerate(post["pairs"]):
         myth_t = _read_time(p["myth"], 1.8, 3.4)
         fact_t = _read_time(p["fact"], 2.2, 4.4)
@@ -171,20 +167,18 @@ def myth_fact(post: dict, account: dict) -> tuple[str, float]:
         <div class="txt" style="font-size:{_size(p["fact"], 70, 62, 54)}px">{_esc(p["fact"])}</div>
         <div class="tick">&#10003;</div></div></div>''')
         js += [f'tl.fromTo("#p{i} .myth", {{x: -900}}, {{x: 0, duration: 0.4, ease: "power3.out"}}, {s});',
-               *_face("skeptical", s),
-               f'tl.fromTo("#head", {{rotation: -5}}, {{rotation: 5, duration: 0.18, repeat: 5, yoyo: true, svgOrigin: "300 500"}}, {s + 0.3});',
+               *presenter.pose(["facepalm", "shrug"][i % 2], s, poses),
                f'tl.fromTo("#p{i} .stamp", {{scale: 3, opacity: 0, rotation: -30}}, {{scale: 1, opacity: 1, rotation: -12, duration: 0.25, '
                f'ease: "power4.in"}}, {stamp});',
                f'tl.to("#p{i} .myth", {{x: 12, duration: 0.05, repeat: 3, yoyo: true}}, {round(stamp + 0.25, 2)});',
                f'tl.to("#p{i} .myth", {{opacity: 0.35, scale: 0.92, y: -40, duration: 0.3}}, {round(fact_at - 0.1, 2)});',
                f'tl.fromTo("#p{i} .fact", {{y: 500, opacity: 0}}, {{y: 0, opacity: 1, duration: 0.4, ease: "back.out(1.4)"}}, {fact_at});',
                f'tl.fromTo("#p{i} .tick", {{scale: 0}}, {{scale: 1, duration: 0.3, ease: "back.out(3)"}}, {round(fact_at + 0.35, 2)});',
-               *_face("happy", fact_at),
-               f'tl.fromTo("#head", {{rotation: 0}}, {{rotation: 6, duration: 0.2, repeat: 3, yoyo: true, svgOrigin: "300 500"}}, {fact_at + 0.1});']
+               *presenter.pose(["point_up", "thumbs"][i % 2], fact_at, poses)]
         cursor += dur
     cta_at = round(cursor, 2)
     total = round(cta_at + _read_time(post["cta"], 2.6, 4.0, extra=0.9), 2)
-    js += _face("excited", cta_at)
+    js += presenter.pose("wink", cta_at, poses) + [_idle(total)]
     css = f'''
 #hook {{ position: absolute; top: 300px; left: 70px; right: 70px; text-align: center; }}
 .card {{ position: absolute; left: 60px; right: 60px; border-radius: 44px; padding: 44px 50px 50px; background: #fff; color: #111;
@@ -196,12 +190,11 @@ def myth_fact(post: dict, account: dict) -> tuple[str, float]:
 .stamp {{ position: absolute; left: 0; right: 0; top: 50%; margin-top: -170px; text-align: center; font-size: 300px;
   line-height: 340px; font-weight: 900; color: #E5383B; opacity: 0; text-shadow: 0 8px 30px rgba(0,0,0,.25); }}
 .tick {{ position: absolute; right: 50px; top: 24px; font-size: 110px; font-weight: 900; color: #2BB673; }}
-#stage {{ position: absolute; left: 160px; bottom: -230px; }}
-{_face_css("happy")}
+{presenter.css(left=240, width=600)}{PRESENTER_GLOW}
 '''
     body = f'''{_root(total)}
   <div id="scene" class="clip" data-start="0" data-duration="{total}" data-track-index="0">
-    <div id="stage">{character(look)}</div><div class="handle">@{_esc(account["handle"])}</div>
+    {presenter.html(poses)}<div class="handle">@{_esc(account["handle"])}</div>
     <div id="hook" class="heading" style="font-size:{_size(post["hook"], 104, 88, 74)}px">{_words(post["hook"], "w")}</div></div>
   {"".join(scenes)}'''
     cta_el, cta_js = _cta(post, account, cta_at, total)
@@ -210,17 +203,14 @@ def myth_fact(post: dict, account: dict) -> tuple[str, float]:
 
 # ---------- checklist ----------
 
-def checklist(post: dict, account: dict) -> tuple[str, float]:
+def checklist(post: dict, account: dict, poses: dict) -> tuple[str, float]:
     t = _theme(account)
-    look = LOOKS.get(account["id"], LOOKS["acc1"])
     items = post["items"]
     start = _read_time(post["hook"], 2.0, 3.0)
     rows, js, cursor, y = [], [], start, 0
     js += ['tl.fromTo("#board", {y: 1200, rotation: 4}, {y: 0, rotation: 0, duration: 0.5, ease: "back.out(1.2)"}, 0);',
            'tl.fromTo("#title .w", {y: 40, opacity: 0}, {y: 0, opacity: 1, duration: 0.28, stagger: 0.05, ease: "back.out(2)"}, 0.4);',
-           'tl.fromTo("#mascot", {y: 500}, {y: 0, duration: 0.45, ease: "back.out(1.8)"}, 0.3);',
-           f'tl.to("#body", {{y: -10, duration: 0.9, repeat: 40, yoyo: true, ease: "sine.inOut"}}, 0);',
-           'tl.to("#armR", {rotation: -150, duration: 0.3, svgOrigin: "412 600"}, 0.8);']
+           *presenter.enter(0.3), *presenter.pose("point", 0.3, poses)]
     for i, item in enumerate(items):
         lines = max(1, math.ceil(len(item) / 30))
         h = 40 + lines * 56
@@ -234,12 +224,12 @@ def checklist(post: dict, account: dict) -> tuple[str, float]:
         js += [f'tl.fromTo("#r{i}", {{opacity: 0, x: 60}}, {{opacity: 1, x: 0, duration: 0.3, ease: "power3.out"}}, {at});',
                f'tl.to("#r{i} .check", {{strokeDashoffset: 0, duration: 0.35, ease: "power2.out"}}, {round(at + 0.4, 2)});',
                f'tl.fromTo("#r{i} .box", {{scale: 1}}, {{scale: 1.2, duration: 0.12, repeat: 1, yoyo: true, transformOrigin: "50% 50%"}}, {round(at + 0.4, 2)});',
-               *_face(["happy", "excited", "thinking"][i % 3], at)]
+               *presenter.pose(["thumbs", "point_up", "explain", "wink", "think"][i % 5], round(at + 0.4, 2), poses)]
         y += h + 22
         cursor += hold
     cta_at = round(cursor, 2)
     total = round(cta_at + _read_time(post["cta"], 2.6, 4.0, extra=0.9), 2)
-    js += _face("excited", cta_at)
+    js += presenter.pose("celebrate", cta_at, poses) + [_idle(total)]
     css = f'''
 #board {{ position: absolute; top: 120px; left: 60px; right: 60px; background: #fff; color: #111; border-radius: 40px;
   padding: 120px 56px 40px; box-shadow: 0 24px 60px rgba(0,0,0,.25); }}
@@ -249,12 +239,11 @@ def checklist(post: dict, account: dict) -> tuple[str, float]:
 #list {{ position: relative; }}
 .row {{ position: absolute; left: 0; right: 0; display: flex; gap: 28px; align-items: flex-start; opacity: 0; }}
 .item {{ font-size: 44px; line-height: 1.27; font-weight: 600; padding-top: 6px; }}
-#stage {{ position: absolute; right: -60px; bottom: -260px; transform: scale(.72); transform-origin: bottom right; }}
-{_face_css("happy")}
+{presenter.css(right=-30, width=560)}{PRESENTER_GLOW}
 '''
     body = f'''{_root(total)}
   <div id="scene" class="clip" data-start="0" data-duration="{total}" data-track-index="0">
-    <div id="stage">{character(look)}</div>
+    {presenter.html(poses)}
     <div id="board"><div id="clip-top"></div><div id="title" class="heading">{_words(post["hook"], "w")}</div>
       <div id="list" style="height:{y}px">{"".join(rows)}</div></div>
     <div class="handle">@{_esc(account["handle"])}</div></div>'''
@@ -266,5 +255,6 @@ BUILDERS = {"chat": chat, "myth_fact": myth_fact, "checklist": checklist}
 
 
 def render(fmt: str, post: dict, account: dict, music: Path, out: Path) -> Path:
-    page, _ = BUILDERS[fmt](post, account)
-    return render_project(page, music, out)
+    poses = presenter.pose_files(account["id"]) if fmt != "chat" else {}
+    page, _ = BUILDERS[fmt](post, account, poses)
+    return render_project(page, music, out, extra=presenter.assets(poses))
