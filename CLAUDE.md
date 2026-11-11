@@ -45,6 +45,10 @@ acc5 foundr_world (Storyteller, real company stories only). Profiles in `config/
   chat, myth_fact, checklist, animated (`engine/render/formats2d.py`, `animated.py`, mascot art in `mascot.py`),
   and explainer (narrated, free Kokoro voice at 1.2x, one voice per account; `engine/render/explainer.py`,
   `engine/voice.py`, spec in `docs/explainer-format.md`), 15% of each account's mix.
+- Own-product promos (`config/promos.yaml`, `engine/promos.py`): `kind: promo`, always reaction Reels with a live
+  screen capture of the site (`engine/render/site.py`) and a link-in-bio card. Each active promo takes `share`
+  (10%) of the weekly plan; facts only from its brief; promos never become winners. Bio links point to the
+  promo. First promo: replymaxxing.beesz.com (from 12 Nov 2026; mid-week swap via `scripts/promo_swap.py`).
 - Changes to content strategy go through the owner; a 1-week hook test ran 28 Oct - 3 Nov.
 
 ## Known gotchas

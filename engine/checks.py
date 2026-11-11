@@ -60,7 +60,7 @@ def _ungrounded_numbers(post: dict, sources: list[str], min_agree: int = 1) -> l
 
 def check_post(post: dict, fmt: str = "carousel", recent_hooks: list[str] = (),
                source_text: str | None = None, source_texts: list[str] | None = None,
-               min_agree: int = 1) -> list[str]:
+               min_agree: int = 1, promo: bool = False) -> list[str]:
     """source_text(s): for sourced posts (news, Reddit, breakdowns, India guides) the material that replaces
     the fact sheet. min_agree: how many sources must contain each figure (2 for India guides)."""
     if source_text is not None:
@@ -118,7 +118,7 @@ def check_post(post: dict, fmt: str = "carousel", recent_hooks: list[str] = (),
 
     text = _all_text(post).lower()
     for phrase in BANNED:
-        if phrase in text:
+        if phrase in text and not (promo and phrase == "beesz"):  # our own product's URL is beesz.com
             problems.append(f"banned phrase: {phrase!r}")
 
     if source_texts is not None:

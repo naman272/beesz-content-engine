@@ -5,7 +5,7 @@ from pathlib import Path
 
 from engine import assets, db, storage
 from engine.config import ROOT
-from engine.render import animated, carousel, explainer, formats2d, reaction
+from engine.render import animated, carousel, explainer, formats2d, reaction, site
 
 WORK = ROOT / "output" / "render"
 
@@ -20,6 +20,15 @@ def recently_used(account_id: str, days: int = 14) -> set[str]:
         used.update(a.get("backgrounds", []))
         used.update(x for x in (a.get("music"), a.get("reaction")) if x)
     return used
+
+
+def promo_url(post_row: dict) -> str:
+    """The promoted site: from the post's source_url, else the promo running on its date."""
+    if post_row.get("source_url"):
+        return post_row["source_url"]
+    from engine import promos
+    promo = promos.active(datetime.fromisoformat(post_row["scheduled_at"]).date()) or promos.load()[0]
+    return promo["url"]
 
 
 def render(post_row: dict, account: dict) -> tuple[list[Path], dict]:
@@ -44,7 +53,13 @@ def render(post_row: dict, account: dict) -> tuple[list[Path], dict]:
             avoid.add(bg["file"])
             backgrounds.append(bg)
         music = assets.pick_music(post["music_mood"], avoid)
-        video = reaction.render(post, account, clip, backgrounds, assets.path(music["file"]), out / "reel.mp4")
+        site_clip = link = None
+        if post_row.get("kind") == "promo":  # live capture of our own product, then "link in bio"
+            link = promo_url(post_row)
+            out.mkdir(parents=True, exist_ok=True)
+            site_clip = site.render(link, account, out / "site.mp4")
+        video = reaction.render(post, account, clip, backgrounds, assets.path(music["file"]), out / "reel.mp4",
+                                site_clip=site_clip, link=link)
         return [video], {"backgrounds": [b["file"] for b in backgrounds], "music": music["file"],
                          "music_credit": f"{music['title']} - {music['artist']}", "reaction": clip["file"]}
 

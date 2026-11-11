@@ -7,7 +7,7 @@ from zoneinfo import ZoneInfo
 
 import anthropic
 
-from engine import content, db, llm
+from engine import content, db, llm, promos
 from engine.config import env
 
 
@@ -118,7 +118,7 @@ def plan_angles(topic_counts: Counter, avoid: list[str]) -> dict[str, list[str]]
     return angles
 
 
-SOURCED_KINDS = ("reddit_qa", "breakdown", "india_admin", "funding_roundup")
+SOURCED_KINDS = ("reddit_qa", "breakdown", "india_admin", "funding_roundup", "promo")
 CAROUSEL_ONLY = ("funding_roundup",)  # one round per slide reads best as a carousel
 # Formats that suit each post type (a company breakdown doesn't work as a fake DM chat, etc.)
 KIND_FORMATS = {
@@ -129,6 +129,7 @@ KIND_FORMATS = {
     "funding_roundup": ("carousel",),
     "news": ("carousel", "reaction", "animated", "explainer"),
     "winner": None,
+    "promo": ("reaction",),  # own-product promos: the face hook works best, then a live capture of the site
 }
 
 
@@ -155,15 +156,21 @@ def _fetch_docs(kind: str, count: int, week_start: date) -> list[dict]:
     if kind == "funding_roundup":
         doc = sources.funding_roundup(week_start.isoformat())
         return [doc] if doc else []
+    if kind == "promo":
+        promo = promos.active(week_start)
+        return promos.docs(promo, count) if promo else []
     return []
 
 
-def build_week(cfg: dict, start: date, only_slots: dict[str, list[datetime]] | None = None) -> dict:
+def build_week(cfg: dict, start: date, only_slots: dict[str, list[datetime]] | None = None,
+               force_kind: str | None = None) -> dict:
     """Returns {custom_id: plan entry}. Evergreen entries group slots by (account, format, topic) and carry
-    angles; sourced entries are one slot each and carry the real source material ("doc")."""
+    angles; sourced entries are one slot each and carry the real source material ("doc").
+    force_kind: every slot gets this kind (e.g. "promo" when swapping slots for a product promo)."""
     from engine import sources
     tz = ZoneInfo(cfg["timezone"])
     roundup_cfg = sources.settings()["funding_roundup"]
+    promo = promos.active(start)
 
     top_winners = winners()
     planned = []  # [account_id, slot, format, topic, kind]
@@ -172,8 +179,13 @@ def build_week(cfg: dict, start: date, only_slots: dict[str, list[datetime]] | N
         n = len(account_slots)
         # Exploit/explore: a fixed share of slots reuse the winning pattern, the rest follow the content mix
         n_win = round(n * cfg.get("exploit_share", 0)) if n and top_winners else 0
-        kinds = ["winner"] * n_win + (_allocate(account.get("content_mix") or {"evergreen": 1}, n - n_win) if n else [])
+        # Own-product promo takes its share first (whole weeks only; refills keep what's already planned)
+        n_promo = round(n * promo["share"]) if promo and n and only_slots is None else 0
+        kinds = (["promo"] * n_promo + ["winner"] * n_win
+                 + (_allocate(account.get("content_mix") or {"evergreen": 1}, n - n_win - n_promo) if n else []))
         random.shuffle(kinds)
+        if force_kind:
+            kinds = [force_kind] * n
         rows = [[account["id"], slot, fmt, topic, kind]
                 for slot, (fmt, topic), kind in zip(account_slots, assign(cfg, account, account_slots), kinds)]
         if account["id"] == roundup_cfg["account"] and rows and only_slots is None:  # refills never add a roundup

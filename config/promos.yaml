@@ -1,0 +1,36 @@
+# Own-product promos. Each active promo takes `share` of every account's weekly slots (always reaction Reels:
+# hook on a reaction clip, text points, then a live screen capture of the site, then a link-in-bio card).
+# Facts below are the ONLY claims a promo post may make (numbers are checked against this text).
+promos:
+  - id: replymaxxing
+    name: Replymaxxing
+    url: replymaxxing.beesz.com
+    start: 2026-11-12
+    end: 2027-01-31
+    share: 0.1
+    brief: |
+      Replymaxxing (replymaxxing.beesz.com) is a free Chrome extension plus a live monthly leaderboard that
+      ranks founders and builders by how consistently they reply and post on X.
+      Tagline: "Building is easy. Distribution is consistency."
+      The idea: everyone says getting your first 10 customers is hard. Most founders lurk on X instead of
+      showing up. Replying to people every day is the most underrated distribution channel for early-stage
+      founders, and this board shows who is actually putting in the work.
+      Rules: replies, posts and quote posts all count toward your monthly total. Replies and posts under 4
+      words don't count ("Great post", "This", "Agreed"); mentions, links and emojis don't count as words.
+      Posting the same or nearly the same thing to different people only counts once. No AI agents: every
+      post is checked for automation, and at least 80% must pass to stay ranked. Posts are spot-checked
+      against X and the top 10 are reviewed by a person every month.
+      How to join (takes 30 seconds, on a laptop/desktop with Chrome): add the free extension from the
+      Chrome Web Store, refresh any open X tab, click the icon and sign in with X. Then reply like you
+      normally do; each real reply counts live. The board resets every month and is wide open right now:
+      new builders can get onto it easily.
+      You get a shareable rank card you can post on X.
+      Link is in the bio of this account.
+    angles:
+      - "the board is wide open this month: anyone who replies consistently can make the top 10"
+      - "distribution is consistency: replying daily beats one viral post"
+      - "your first 10 customers are in the replies, not in your launch post"
+      - "AI reply bots don't count: only real, thoughtful replies make the board"
+      - "'Great post 🔥' doesn't count: replies under 4 words are ignored, write real ones"
+      - "founders build for months and post once; this board makes you show up every day"
+      - "a public scoreboard is the accountability trick to actually post on X"

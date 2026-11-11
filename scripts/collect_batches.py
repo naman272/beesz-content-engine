@@ -23,7 +23,7 @@ def check(post: dict, group: dict, avoid: list[str]) -> list[str]:
     doc = group.get("doc")
     if not doc:
         return checks.check_post(post, group["format"], avoid)
-    problems = checks.check_post(post, group["format"], avoid, source_texts=doc["texts"])
+    problems = checks.check_post(post, group["format"], avoid, source_texts=doc["texts"], promo=doc["kind"] == "promo")
     if doc["kind"] == "india_admin" and post.get("slides"):
         if len(post["slides"]) > 5:
             problems.append(f"India guide too long: {len(post['slides'])} slides (max 5)")
@@ -70,7 +70,7 @@ def collect(client, row: dict, cfg: dict) -> str:
             if doc.get("kind") == "breakdown":
                 post["source_name"] = doc.get("source_name")
             rows.append({
-                "kind": group.get("kind", "evergreen"), "source_url": doc.get("source_url"),
+                "kind": group.get("kind", "evergreen"), "source_url": doc.get("source_url") or doc.get("url"),
                 "account_id": group["account"], "format": group["format"], "topic": post["topic"],
                 "hook_type": post["hook_type"], "hook": post["hook"], "content": post,
                 "status": "planned", "scheduled_at": slot, "batch_id": row["id"],

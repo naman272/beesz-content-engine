@@ -53,10 +53,12 @@ def scene_layer(text: str, index: int, total: int, handle: str) -> str:
       <div class="bar"></div></div><div class="handle">@{handle}</div></div>"""
 
 
-def cta_layer(text: str, handle: str) -> str:
+def cta_layer(text: str, handle: str, link: str | None = None) -> str:
+    """link: for promos, point to the link in bio instead of asking for a follow."""
+    follow = f"<b>{link}</b>" if link else f"Follow <b>@{handle}</b> for more"
     return f"""<div class="layer cta"><div class="content">
       <div class="main heading fit" data-max="88" data-min="52">{_text(text)}</div>
-      <div class="follow">Follow <b>@{handle}</b> for more</div></div></div>"""
+      <div class="follow">{follow}</div></div></div>"""
 
 
 def render(layers: list[tuple[str, bool]], account: dict, out_dir: Path) -> list[Path]:

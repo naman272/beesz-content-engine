@@ -317,6 +317,16 @@ SOURCED_GUIDES = {
         "Use ONLY facts in the headlines; never add investors or details they don't state. "
         "Put \"sources\" in facts_used.\n\nHEADLINES:\n{source}"
     ),
+    "promo": (
+        "PROMO FOR OUR OWN FREE TOOL: {label}. This post promotes it openly; it's ours (built by Beesz), so no fake "
+        "testimonials, no invented users, results or numbers. Use ONLY the facts below. ANGLE: {angle}.\n"
+        "Hook: a real person reacting, e.g. 'wait the reply guys are the ones getting customers??' (never sound like an ad). "
+        "Points: 3-4 lines: the founder problem -> what the tool is -> what counts / why it works -> how to join. "
+        "Don't quote live counts or rankings (the video shows the live board). The site is opened on a laptop "
+        "(Chrome extension), so the CTA tells people to save this and grab the link in bio, e.g. 'Link in bio. "
+        "Save this for your laptop'. Caption: 2-4 short lines, mention {url} and that the link is in the bio. "
+        "facts_used: [\"sources\"].\n\nFACTS:\n{source}"
+    ),
 }
 
 
@@ -331,7 +341,8 @@ def sourced_params(model: str, account: dict, fmt: str, doc: dict, fix_notes: st
     label = FORMAT_LABELS[fmt]
     task = f"Write 1 {label}. Pick the topic that fits best.\n" + SOURCED_GUIDES[doc["kind"]].format(
         source=source, label=doc.get("label", ""), sub=doc.get("sub", ""),
-        source_name=doc.get("source_name", ""), official=doc.get("official", "the official portal"))
+        source_name=doc.get("source_name", ""), official=doc.get("official", "the official portal"),
+        angle=doc.get("angle", ""), url=doc.get("url", ""))
     if doc.get("previous_hooks"):
         task += ("\n\nWe already posted about this before. Take a clearly DIFFERENT angle and lesson than these:\n"
                  + "\n".join(f"- {h}" for h in doc["previous_hooks"]))

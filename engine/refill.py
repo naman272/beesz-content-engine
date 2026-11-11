@@ -10,10 +10,10 @@ from engine import content, db, llm, planner
 from engine.config import env
 
 
-def submit(cfg: dict, slots: dict[str, list[datetime]]) -> dict[str, int]:
+def submit(cfg: dict, slots: dict[str, list[datetime]], force_kind: str | None = None) -> dict[str, int]:
     """slots: account_id -> datetimes to fill. Returns posts planned per kind/format."""
     start = min(min(v) for v in slots.values()).date()
-    plan = planner.build_week(cfg, start, only_slots=slots)
+    plan = planner.build_week(cfg, start, only_slots=slots, force_kind=force_kind)
     accounts = {a["id"]: a for a in cfg["accounts"]}
     model = llm.model_for(fast=False)
     avoid, proven = planner.recent_hooks(), planner.proven_hooks()

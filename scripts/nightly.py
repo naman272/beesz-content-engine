@@ -79,7 +79,8 @@ def find_winners(rows: list[dict]) -> list[dict]:
     winners = []
     for r in rows:
         p, views = r["post"], r["views"] or 0
-        if p["id"] in known or r["hours_live"] > WINNER_WINDOW_HOURS:
+        # Promos are about our product, so they never become the pattern other posts copy
+        if p["id"] in known or r["hours_live"] > WINNER_WINDOW_HOURS or p.get("kind") == "promo":
             continue
         account_views = by_account[p["account_id"]]
         relative = len(account_views) >= 10 and views >= 300 and views >= RELATIVE_WINNER * median(account_views)
