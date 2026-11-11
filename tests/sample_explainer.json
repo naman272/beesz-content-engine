@@ -19,7 +19,7 @@
     {
       "say": "Write down a list of people who have the exact problem you solve, by name, not by audience type.",
       "emphasis": "by name",
-      "gesture": "explain",
+      "gesture": "facepalm",
       "visual": {
         "type": "checklist",
         "title": "Your first list",
@@ -37,7 +37,7 @@
     {
       "say": "Message them one by one, not a broadcast, and ask about their problem before you pitch anything.",
       "emphasis": "one by one",
-      "gesture": "explain",
+      "gesture": "phone",
       "visual": {
         "type": "chat",
         "title": "How do you handle this today?",
@@ -50,7 +50,7 @@
     {
       "say": "If they describe the pain in their own words, ask for a short call that same week.",
       "emphasis": "same week",
-      "gesture": "point",
+      "gesture": "point_up",
       "visual": {
         "type": "calendar",
         "title": "Book the call",
@@ -97,7 +97,7 @@
     {
       "say": "Once people pay, call them and ask why they bought, then copy their exact words into your pitch.",
       "emphasis": "their exact words",
-      "gesture": "mouth",
+      "gesture": "wink",
       "visual": {
         "type": "phone_stats",
         "title": "Customer call",

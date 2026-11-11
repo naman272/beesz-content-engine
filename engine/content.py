@@ -78,7 +78,7 @@ FORMAT_GUIDES = {
     "explainer": (
         "NARRATED EXPLAINER REEL (30-45 seconds, spoken by a voiceover): the hook is said first, then 5-7 beats, "
         "then the CTA is said. The whole script (hook + every say + cta) must be under 120 words. Each beat 'say' is ONE short natural spoken sentence (how a person talks, contractions "
-        "welcome). emphasis = 1-2 words from that sentence to highlight. gesture = the presenter's move. visual = "
+        "welcome). emphasis = 1-2 words from that sentence to highlight. gesture = the presenter's pose for that beat (point = points at the illustration, point_up = 'here's the thing', mouth = shocked, facepalm = a painful mistake, phone = checking stats/DMs, think, shrug, explain, thumbs, wink = a cheeky tip, celebrate = a win); vary them. visual = "
         "one UI-style illustration that shows the beat: phone_stats (a profile/stats screen: title, value, label), "
         "stamp (a document stamped with value), counter (a big number counting up), chart (a rising line with "
         "value), chat (an AI/chat box typing title), checklist (items), calendar (value like NOW or a day), cards "

@@ -17,7 +17,33 @@ VISUALS = ("phone_stats", "stamp", "counter", "chart", "chat", "checklist", "cal
            "progress", "big_text", "headline", "editor", "terminal", "folder", "comments", "browser",
            "notifications", "app_card", "invoice", "invite", "bank")
 SCENES = ("paper", "ink", "accent")
-GESTURES = ("point", "explain", "shrug", "mouth", "thumbs", "celebrate", "think")
+GESTURES = ("point", "explain", "shrug", "mouth", "thumbs", "celebrate", "think", "facepalm", "phone", "point_up", "wink")
+# Illustrated presenter: one PNG per pose (media/library/characters/<account or shared>/<pose>.png)
+CHARACTERS = Path(__file__).resolve().parents[2] / "media" / "library" / "characters"
+POSE_FOR = {"point": "point_side", "explain": "explain", "shrug": "shrug", "mouth": "shocked", "thumbs": "thumbs_up",
+            "celebrate": "celebrate", "think": "thinking", "facepalm": "facepalm", "phone": "phone",
+            "point_up": "point_up", "wink": "wink_thumbs", "neutral": "neutral"}
+# The vector mascot has fewer moves; the extra poses map to its closest one
+SVG_FALLBACK = {"facepalm": "mouth", "phone": "explain", "point_up": "point", "wink": "thumbs"}
+
+
+def pose_files(account_id: str) -> dict[str, Path]:
+    """pose name -> PNG, from the account's own folder if it has one, else the shared character."""
+    for folder in (CHARACTERS / account_id, CHARACTERS / "shared"):
+        files = {f.stem: f for f in folder.glob("*.png")} if folder.is_dir() else {}
+        if files:
+            return files
+    return {}
+
+
+def _pose(name: str, at: float, poses: dict[str, Path]) -> list[str]:
+    """Swap to the pose for this gesture with a quick squash-and-bounce."""
+    pose = POSE_FOR.get(name, "explain")
+    if pose not in poses:
+        pose = "explain" if "explain" in poses else next(iter(poses))
+    return [f'tl.set(".pose", {{opacity: 0}}, {at});', f'tl.set("#p-{pose}", {{opacity: 1}}, {at});',
+            f'tl.fromTo("#presenter", {{scaleX: 1.06, scaleY: 0.92}}, {{scaleX: 1, scaleY: 1, duration: 0.35, '
+            f'ease: "back.out(3)", transformOrigin: "50% 100%"}}, {at});']
 # Accent colours that read well on paper (the account accents are tuned for dark backgrounds)
 PAPER_ACCENT = {"acc1": "#E63946", "acc2": "#C8763A", "acc3": "#1E6FD9", "acc4": "#7B2FF7", "acc5": "#D62828"}
 PAPER, INK = "#EFEDE8", "#141414"
@@ -208,6 +234,7 @@ def _confetti(at: float) -> list[str]:
 
 
 def _gesture(name: str, at: float) -> list[str]:
+    name = SVG_FALLBACK.get(name, name)
     arm_r, arm_l = 'svgOrigin: "412 600"', 'svgOrigin: "188 600"'
     poses = {
         "point": [f'tl.to("#armR", {{rotation: -150, duration: 0.3, {arm_r}, ease: "back.out(2)"}}, {at});',
@@ -231,8 +258,11 @@ def _gesture(name: str, at: float) -> list[str]:
     return js
 
 
-def composition(post: dict, account: dict, spans: list[tuple[float, float]], total: float) -> str:
+def composition(post: dict, account: dict, spans: list[tuple[float, float]], total: float,
+                poses: dict[str, Path] | None = None) -> str:
+    """poses: illustrated presenter images (pose -> file); without them the vector mascot is used."""
     accent = PAPER_ACCENT.get(account["id"], "#E63946")
+    gesture = (lambda name, at: _pose(name, at, poses)) if poses else _gesture
     look = {**LOOKS.get(account["id"], LOOKS["acc1"])}
     t_fonts = account["fonts"]
     lines = [post["hook"], *[b["say"] for b in post["beats"]], post["cta"]]
@@ -256,6 +286,10 @@ def composition(post: dict, account: dict, spans: list[tuple[float, float]], tot
                 js.append(f'tl.fromTo("#{cid} .cw:nth-child({wi + 1})", {{y: 22, opacity: 0}}, {{y: 0, opacity: 1, duration: 0.1, ease: "power2.out"}}, {wt});')
                 before += len(w) + 1
             t += d
+        if poses:  # the illustrated presenter bobs gently while the voice speaks
+            js.append(f'tl.fromTo("#presenter-bob", {{y: 0}}, {{y: -10, duration: 0.22, repeat: {max(1, int((e - s) / 0.22))}, '
+                      f'yoyo: true, ease: "sine.inOut"}}, {s});')
+            continue
         # Mouth moves while speaking
         js += [f'tl.set(".mouth", {{opacity: 0}}, {s});', f'tl.set("#m-talk", {{opacity: 1}}, {s});',
                f'tl.fromTo("#talkshape", {{scaleY: 0.25}}, {{scaleY: 1, duration: 0.11, repeat: {max(1, int((e - s) / 0.11))}, '
@@ -273,7 +307,7 @@ def composition(post: dict, account: dict, spans: list[tuple[float, float]], tot
                    f'<div class="ctacard"><div class="cta-save">SAVE THIS</div><div class="cta-f">Follow <b>@{_e(account["handle"])}</b></div></div></div>')
     js += [f'tl.fromTo("#vcta .ctacard", {{y: 300, opacity: 0}}, {{y: 0, opacity: 1, duration: 0.4, ease: "back.out(1.6)"}}, {cs});',
            f'tl.fromTo("#vcta .cta-save", {{scale: 2.2, opacity: 0, rotation: -18}}, {{scale: 1, opacity: 1, rotation: -6, duration: 0.25, ease: "power4.in"}}, {round(cs + 0.4, 2)});']
-    js += _gesture("mouth", 0.1) + ['tl.fromTo("#mascot", {y: 600}, {y: 0, duration: 0.5, ease: "back.out(1.6)"}, 0);']
+    js += gesture("mouth", 0.1) + [f'tl.fromTo("#{"presenter-in" if poses else "mascot"}", {{y: 600}}, {{y: 0, duration: 0.5, ease: "back.out(1.6)"}}, 0);']
     scenes_html, prev_scene = [], "paper"
     scene_colors = {"paper": PAPER, "ink": INK, "accent": accent}
     for bi, beat in enumerate(post["beats"], 1):
@@ -294,10 +328,10 @@ def composition(post: dict, account: dict, spans: list[tuple[float, float]], tot
         body, vjs, _ = visual(bi, beat.get("visual") or {}, accent)
         visuals.append(f'<div id="v{bi}" class="clip vis" data-start="{s}" data-duration="{round(nxt - s, 2)}" data-track-index="1">{body}</div>')
         js += [x.replace("AT", str(s)) for x in vjs]
-        js += _gesture(beat.get("gesture", "explain"), s)
+        js += gesture(beat.get("gesture", "explain"), s)
         js.append(f'tl.set("#meta-r", {{textContent: "BEAT {bi}/{n_beats}"}}, {s});')
         js.append(f'tl.set("#meta-l", {{textContent: "// {bi:02d} · {_e(beat.get("visual", {}).get("type", "idea")).replace("_", " ")}"}}, {s});')
-    js += _gesture("celebrate", spans[-1][0]) + _confetti(spans[-1][0] + 0.5)
+    js += gesture("celebrate", spans[-1][0]) + _confetti(spans[-1][0] + 0.5)
     scenes_html.append(f'<div id="sccta" class="clip scene" data-start="{spans[-1][0]}" data-duration="{round(total - spans[-1][0], 2)}" '
                        f'data-track-index="0" style="background:{accent}"></div>')
     js.append(f'tl.fromTo("#sccta", {{clipPath: "inset(0 0 100% 0)"}}, {{clipPath: "inset(0 0 0% 0)", duration: 0.35, ease: "power3.inOut"}}, {spans[-1][0]});')
@@ -361,6 +395,10 @@ html, body {{ width: 1080px; height: 1920px; overflow: hidden; background: {PAPE
 .pg {{ height: 56px; background: #E4E1DA; border-radius: 30px; overflow: hidden; margin: 26px 0; }} .pg-f {{ height: 100%; background: {accent}; }}
 .pg-v {{ font-size: 90px; font-weight: 900; color: {accent}; }}
 .bigtext {{ text-align: center; }} .bt-v {{ font-size: 170px; font-weight: 900; line-height: 1; color: {INK}; }}
+#presenter-in {{ position: absolute; right: -40px; bottom: 0; width: 700px; height: 707px; }}
+#presenter-bob, #presenter {{ position: absolute; inset: 0; }}
+#root[data-scene="ink"] #presenter {{ filter: drop-shadow(0 0 3px rgba(255,255,255,.9)) drop-shadow(0 0 22px rgba(255,255,255,.25)); }}
+.pose {{ position: absolute; left: 0; bottom: 0; width: 100%; height: 100%; object-fit: contain; object-position: bottom; opacity: 0; }}
 .brow, .mouth, #burst {{ opacity: 0; }} #b-up, #m-happy {{ opacity: 1; }}
 .scene {{ z-index: 0; }} #world {{ z-index: 1; }} .vis {{ z-index: 2; }} .cap {{ z-index: 3; }}
 #root[data-scene="ink"] .cap-t, #root[data-scene="ink"] .meta, #root[data-scene="ink"] .handle,
@@ -426,12 +464,17 @@ html, body {{ width: 1080px; height: 1920px; overflow: hidden; background: {PAPE
   border-radius: 16px; letter-spacing: .06em; }}
 .cta-f {{ margin-top: 36px; font-size: 46px; }} .cta-f b {{ color: {accent}; }}
 '''
+    if poses:
+        imgs = "".join(f'<img id="p-{name}" class="pose" src="assets/pose_{name}.png">' for name in poses)
+        presenter = f'<div id="presenter-in"><div id="presenter-bob"><div id="presenter">{imgs}</div></div></div>'
+    else:
+        presenter = f'<div id="stage">{character(look)}</div>'
     body = f'''<div id="root" data-composition-id="main" data-start="0" data-duration="{total}" data-width="1080" data-height="1920">
   {"".join(scenes_html)}
   <div id="world" class="clip" data-start="0" data-duration="{total}" data-track-index="0">
     <div id="meta-l" class="meta">// 00 · hook</div><div class="handle">@{_e(account["handle"])}</div>
     <div id="meta-r" class="meta">BEAT 0/{n_beats}</div>
-    <div id="stage">{character(look)}</div>
+    {presenter}
     <div id="badge"><div class="bd-m">{_e(account["handle"][:1].upper())}</div><div class="bd-t">@{_e(account["handle"])}<br><span>founder notes</span></div></div>
     <div id="confetti">{"".join(f'<i id="cf{k}" class="cf" style="background:{[accent, INK, "#FFD60A", "#fff"][k % 4]}"></i>' for k in range(CONFETTI))}</div>
     <div id="grain"></div></div>
@@ -459,5 +502,7 @@ def render(post: dict, account: dict, music: Path, out: Path) -> Path:
     lines = [post["hook"], *[b["say"] for b in post["beats"]], post["cta"]]
     spans = voice.narrate(lines, account["id"], wav)
     total = round(spans[-1][1] + 0.6, 2)
-    page = composition(post, account, spans, total)
-    return render_project(page, music, out, extra={"voice.wav": wav})
+    poses = pose_files(account["id"])
+    page = composition(post, account, spans, total, poses)
+    extra = {"voice.wav": wav, **{f"pose_{name}.png": f for name, f in poses.items()}}
+    return render_project(page, music, out, extra=extra)
