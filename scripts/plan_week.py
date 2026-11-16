@@ -3,6 +3,7 @@ Anthropic Batch API (50% cheaper). Results are picked up by scripts.collect_batc
 
 Run: python -m scripts.plan_week               # plans the week starting this/next Sunday, if not planned yet
      python -m scripts.plan_week --force       # plan even if that week is already planned
+     python -m scripts.plan_week --catch-up    # Sunday's run failed: plan from a few hours from now to Saturday
 """
 import json
 import sys
@@ -15,6 +16,9 @@ from anthropic.types.messages.batch_create_params import Request
 
 from engine import content, db, llm, planner, telegram
 from engine.config import ROOT, env, load_accounts
+
+
+CATCH_UP_LEAD_HOURS = 3  # time for the batch to be written and the first posts rendered
 
 
 def week_start(cfg: dict) -> date:
@@ -39,13 +43,21 @@ def main() -> None:
     if db.select("batches", {"status": "eq.submitted"}, columns="id") and not force:
         print("A batch is still being written; skipping.")
         return
-    start = week_start(cfg)
+    days, not_before = 7, None
+    if "--catch-up" in sys.argv:
+        tz = ZoneInfo(cfg["timezone"])
+        now = datetime.now(tz)
+        start = now.date()
+        days = (5 - start.weekday()) % 7 + 1  # through Saturday; next Sunday's run plans the following week
+        not_before = now + timedelta(hours=CATCH_UP_LEAD_HOURS)
+    else:
+        start = week_start(cfg)
     if db.select("batches", {"week_start": f"eq.{start.isoformat()}"}, columns="id") and not force:
         print(f"Week of {start} is already planned; skipping.")
         return
     content.LEARNINGS = load_learnings()
 
-    plan = planner.build_week(cfg, start)
+    plan = planner.build_week(cfg, start, days=days, not_before=not_before)
     accounts = {a["id"]: a for a in cfg["accounts"]}
     avoid, proven = planner.recent_hooks(), planner.proven_hooks()
     model = llm.model_for(fast=False)
@@ -59,7 +71,7 @@ def main() -> None:
     db.insert("batches", {"provider_id": batch.id, "week_start": start.isoformat(), "plan": plan})
 
     total = sum(len(g["slots"]) for g in plan.values())
-    msg = (f"🗓 Planning {start:%a %d %b} – {start + timedelta(days=6):%a %d %b}: {total} posts "
+    msg = (f"🗓 Planning {start:%a %d %b} – {start + timedelta(days=days - 1):%a %d %b}: {total} posts "
            f"across {len(accounts)} accounts ({len(requests)} AI requests). I'll report when they're written.")
     print(msg)
     telegram.send_message(msg)

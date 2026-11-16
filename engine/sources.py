@@ -76,12 +76,17 @@ def _fast_json(prompt: str, schema: dict, attempts: int = 3) -> dict:
 
 def _reddit_feed(sub: str) -> list:
     url = f"https://www.reddit.com/r/{sub}/top/.rss?t=week"
-    for _ in range(4):  # Reddit rate-limits cloud servers; back off and retry
-        r = requests.get(url, headers=REDDIT_UA, timeout=30)
-        if r.status_code == 200:
-            return feedparser.parse(r.content).entries
+    status = None
+    for _ in range(4):  # Reddit rate-limits cloud servers and sometimes hangs; back off and retry
+        try:
+            r = requests.get(url, headers=REDDIT_UA, timeout=30)
+            status = r.status_code
+            if r.status_code == 200:
+                return feedparser.parse(r.content).entries
+        except requests.RequestException as e:  # one slow subreddit must not sink the whole plan
+            status = type(e).__name__
         time.sleep(30)
-    print(f"reddit r/{sub}: gave up ({r.status_code})")
+    print(f"reddit r/{sub}: gave up ({status})")
     return []
 
 

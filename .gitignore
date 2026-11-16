@@ -9,6 +9,7 @@ output/
 assets/backgrounds/
 assets/music/
 assets/characters/
+assets/reactions/
 
 # Licensed media lives in its own private repo (naman272/beesz-content-media), checked out here
 media/

@@ -163,7 +163,7 @@ def _fetch_docs(kind: str, count: int, week_start: date) -> list[dict]:
 
 
 def build_week(cfg: dict, start: date, only_slots: dict[str, list[datetime]] | None = None,
-               force_kind: str | None = None) -> dict:
+               force_kind: str | None = None, days: int = 7, not_before: datetime | None = None) -> dict:
     """Returns {custom_id: plan entry}. Evergreen entries group slots by (account, format, topic) and carry
     angles; sourced entries are one slot each and carry the real source material ("doc").
     force_kind: every slot gets this kind (e.g. "promo" when swapping slots for a product promo)."""
@@ -175,7 +175,9 @@ def build_week(cfg: dict, start: date, only_slots: dict[str, list[datetime]] | N
     top_winners = winners()
     planned = []  # [account_id, slot, format, topic, kind]
     for account in cfg["accounts"]:
-        account_slots = slots(cfg, account, start) if only_slots is None else only_slots.get(account["id"], [])
+        account_slots = slots(cfg, account, start, days) if only_slots is None else only_slots.get(account["id"], [])
+        if not_before:  # catch-up plans skip slots too soon to write and render
+            account_slots = [t for t in account_slots if t >= not_before]
         n = len(account_slots)
         # Exploit/explore: a fixed share of slots reuse the winning pattern, the rest follow the content mix
         n_win = round(n * cfg.get("exploit_share", 0)) if n and top_winners else 0
