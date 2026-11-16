@@ -175,12 +175,15 @@ def breakdowns(count: int) -> list[dict]:
                 docs.append({"kind": "breakdown", "label": p["company"], "source_name": n["source"],
                              "source_url": n["url"], "urls": [n["url"]], "texts": [f"{n['title']}\n{text}"]})
 
-    # Then well-known companies from Wikipedia, least recently used first
-    for c in cfg["companies"]:
+    # Then well-known companies from Wikipedia: unused ones first, then the least recently used
+    # (a repeat gets the earlier hooks, so it takes a different angle)
+    last_used = {}
+    for r in db.select("posts", {"source_url": "not.is.null"}, columns="source_url,created_at"):
+        last_used[r["source_url"]] = max(last_used.get(r["source_url"], ""), r["created_at"])
+    companies = sorted(cfg["companies"], key=lambda c: last_used.get(c["url"], ""))
+    for c in companies:
         if len(docs) >= count:
             break
-        if c["url"] in used:
-            continue
         text = fetch_text(c["url"])
         if len(text) >= cfg["min_chars"]:
             docs.append({"kind": "breakdown", "label": c["name"], "source_name": "Wikipedia",
