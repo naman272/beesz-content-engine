@@ -1,8 +1,7 @@
 name: Telegram inbox
 
 on:
-  schedule:
-    - cron: "15 */3 * * *"
+  # Runs inside the Scheduler loop now (scheduler.yml); manual runs still work
   workflow_dispatch:
 
 concurrency: telegram-inbox

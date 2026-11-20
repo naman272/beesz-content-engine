@@ -1,8 +1,7 @@
 name: Hourly
 
 on:
-  schedule:
-    - cron: "7 * * * *"
+  # Runs inside the Scheduler loop now (scheduler.yml); manual runs still work
   workflow_dispatch:
 
 concurrency: hourly

@@ -24,11 +24,15 @@ acc5 foundr_world (Storyteller, real company stories only). Profiles in `config/
   output/weekly_insights.json, then `plan_week` plans and writes Sunday-Saturday in one batch with those
   learnings in the brief. The owner wants planning ONLY on Sundays: no mid-week re-plans or refills.
 - `plan-week`: manual only now (same planner).
-- `hourly`: collect finished batches (checks + one rewrite), news scan (score >= 8), publish due posts.
-- `render` every 4h: render posts due in 7h, upload to R2. Animated formats use HyperFrames (Node 22).
+- `scheduler` (since 21 Nov 2026): one ~5.5h job looping `scripts/scheduler.py`: publish every 10 min, collect
+  batches every 30 min, news + render (posts due in 8h) hourly, Telegram inbox every 3h. Each run queues its
+  successor when it starts (concurrency group `scheduler`); a backup cron restarts a broken chain. Reason: GitHub
+  cron dropped to ~3 runs/day from 14 Nov, so posts went out hours late in bursts. `hourly`, `render` and
+  `telegram-inbox` workflows are manual-only now (no cron) to avoid double publishing.
+- Render: Animated formats use HyperFrames (Node 22).
 - `nightly`: metrics (all IG insights), winners (>=1000 views or 3x account median within ~72h), daily
   report, token refresh, media cleanup. Each step isolated.
-- `telegram-inbox` every 3h: reads links/videos/notes the owner sends the bot (private chat), analyses
+- Telegram inbox (in the scheduler, every 3h): reads links/videos/notes the owner sends the bot (private chat), analyses
   them with Haiku (frames via yt-dlp/ffmpeg), saves as `hooks` source=reference (fed into the winner share),
   replies to each message. Telegram keeps unread updates only 24h. No webhook by owner's choice.
 - `keepalive` weekly: re-enables schedules (public repos pause them after 60 days without commits).

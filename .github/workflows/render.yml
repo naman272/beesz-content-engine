@@ -1,8 +1,7 @@
 name: Render
 
 on:
-  schedule:
-    - cron: "20 */4 * * *"
+  # Runs inside the Scheduler loop now (scheduler.yml); manual runs still work
   workflow_dispatch:
     inputs:
       hours:
