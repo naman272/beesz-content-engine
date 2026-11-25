@@ -26,6 +26,7 @@ HOOK_TYPES = [
 LIMITS = {
     "carousel": {"hook": 70, "cover_subtitle": 70, "slide_title": 55, "slide_body": 230, "cta": 90, "caption": 1500},
     "reaction": {"hook": 60, "point": 90, "cta": 60, "caption": 1500},
+    "flash": {"hook": 70, "cta": 80, "caption": 1800},
     "animated": {"hook": 60, "point": 70, "cta": 60, "caption": 1500},
     "chat": {"hook": 60, "message": 90, "cta": 60, "caption": 1500, "role": 20},
     "myth_fact": {"hook": 60, "myth": 80, "fact": 110, "cta": 60, "caption": 1500},
@@ -34,9 +35,9 @@ LIMITS = {
 }
 
 # Every non-carousel format is a Reel
-REEL_FORMATS = ("reaction", "animated", "chat", "myth_fact", "checklist", "explainer")
+REEL_FORMATS = ("reaction", "flash", "animated", "chat", "myth_fact", "checklist", "explainer")
 FORMAT_LABELS = {
-    "carousel": "carousel post", "reaction": "reaction Reel script", "animated": "animated text Reel script",
+    "carousel": "carousel post", "reaction": "reaction Reel script", "flash": "3-second flash Reel", "animated": "animated text Reel script",
     "chat": "animated chat Reel script", "myth_fact": "myth vs fact Reel script", "checklist": "checklist Reel script",
     "explainer": "narrated explainer Reel script",
 }
@@ -46,6 +47,15 @@ FORMAT_GUIDES = {
         "CAROUSEL: cover (hook + subtitle) -> 4 to 7 value slides (title + body, one idea each) -> CTA slide.\n"
         "Limits (characters): hook {hook}, cover_subtitle {cover_subtitle}, slide title {slide_title}, "
         "slide body {slide_body}, cta {cta}, caption {caption}."
+    ),
+    "flash": (
+        "FLASH REEL (about 3 seconds, loops): only the reaction clip with the hook on screen and a small 'details "
+        "in caption' line. People replay it while they read, so the CAPTION carries all the value: open with one "
+        "line that restates the hook, then 3-5 short lines (line breaks, no bullets or emojis) with the actual "
+        "steps, numbers or story, then the cta as the last line. The hook must be complete and gripping on its own "
+        "(it's all they see), e.g. 'who told you investors sign NDAs before the pitch' or 'wait oyo lost almost as "
+        "much as it earned in one year??'.\n"
+        "Limits (characters): hook {hook}, cta {cta}, caption {caption}."
     ),
     "reaction": (
         "REACTION REEL (about 12-16 seconds): opens on a person's reaction clip with the hook written over it, "
@@ -233,6 +243,13 @@ def post_schema(fmt: str) -> dict:
             **common,
             "reaction": {"type": "string", "enum": assets.reaction_emotions()},
             "points": {"type": "array", "items": point},
+            "music_mood": {"type": "string", "enum": assets.music_moods()},
+            **tail,
+        })
+    elif fmt == "flash":
+        post = _obj({
+            **common,
+            "reaction": {"type": "string", "enum": assets.reaction_emotions()},
             "music_mood": {"type": "string", "enum": assets.music_moods()},
             **tail,
         })

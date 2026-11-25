@@ -61,7 +61,9 @@ acc5 foundr_world (Storyteller, real company stories only). Profiles in `config/
   scrapped.** All accounts: reaction Reels only, content = famous-company breakdowns (50-70%) + 'who told you'
   myth-busts + remixes of winners; India guides, explainers, carousels, promos paused. Hook styles that hold
   viewers: 'who told you <belief>' (skeptical face) and 'wait <company/you> <shocking fact>??' (shocked face).
-  Reaction Reels prefer 3 points (~12-16s) and a 'send this to...' CTA. Face clips are chosen by live median
+  Reaction Reels prefer 3 points (~12-16s) and a 'send this to...' CTA. Flash test (owner idea, 25 Nov): 30% of Reels are
+  3-second loops (`format: flash`, `reaction.render_flash`): face clip + hook + 'details in caption', all the value in
+  the caption, for replays. Compare flash vs reaction in the Sunday review. Face clips are chosen by live median
   skip rate (`engine/clipstats.py`), not rotated. Daily report leads with progress to 100k.
 - Winner remixes (`engine/remix.py`, `kind: remix`): each winner from the last 14 days is re-made once on 2 other
   accounts (new hook/wording, same facts, different face clip); they take slots from the winner share; remixes are

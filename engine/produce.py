@@ -45,6 +45,14 @@ def render(post_row: dict, account: dict) -> tuple[list[Path], dict]:
         files = carousel.render(post, account, bg, out)
         return files, {"backgrounds": [bg["file"]]}
 
+    if fmt == "flash":
+        clip = assets.pick_reaction(post["reaction"])
+        music = assets.pick_music(post["music_mood"], avoid)
+        out.mkdir(parents=True, exist_ok=True)
+        video = reaction.render_flash(post, account, clip, assets.path(music["file"]), out / "reel.mp4")
+        return [video], {"music": music["file"], "music_credit": f"{music['title']} - {music['artist']}",
+                         "reaction": clip["file"]}
+
     if fmt == "reaction":
         # Faces are picked by how well they hold viewers (engine/clipstats.py), not rotated: with only 10 clips,
         # rotation forced weaker faces. Remixes may reuse the winning face.

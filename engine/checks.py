@@ -83,6 +83,10 @@ def check_post(post: dict, fmt: str = "carousel", recent_hooks: list[str] = (),
             problems.append(f"needs {lo}-{hi} points, got {len(post['points'])}")
         for i, p in enumerate(post["points"], 1):
             _too_long(problems, f"point {i}", p["text"], limits["point"])
+    elif fmt == "flash":  # all the value is in the caption
+        lines = [l for l in post["caption"].split("\n") if l.strip()]
+        if len(lines) < 4 or len(post["caption"]) < 250:
+            problems.append("flash caption needs the full details: a hook line, 3-5 detail lines and the cta")
     elif fmt == "chat":
         _too_long(problems, "other_role", post["other_role"], limits["role"])
         if not 5 <= len(post["messages"]) <= 6:

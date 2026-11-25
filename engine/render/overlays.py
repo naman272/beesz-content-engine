@@ -36,6 +36,9 @@ html, body { width: %(W)spx; height: %(H)spx; background: transparent; }
 .cta .follow { margin-top: 60px; font-family: '%(body)s', sans-serif; font-size: 48px; font-weight: 600; }
 .cta .follow b { color: %(accent)s; }
 
+.hint { position: absolute; top: 760px; left: 50%%; transform: translateX(-50%%); white-space: nowrap; color: #fff;
+  font-family: '%(body)s', sans-serif; font-size: 42px; font-weight: 700; background: rgba(0,0,0,.6);
+  padding: 14px 30px; border-radius: 999px; }
 .handle { position: absolute; bottom: 230px; width: 100%%; text-align: center; color: #fff;
   font-family: '%(body)s', sans-serif; font-size: 34px; font-weight: 600; opacity: .85;
   text-shadow: 0 2px 12px rgba(0,0,0,.6); }
@@ -44,6 +47,12 @@ html, body { width: %(W)spx; height: %(H)spx; background: transparent; }
 
 def hook_layer(text: str) -> str:
     return f'<div class="layer"><div class="hookbox"><div class="box heading fit" data-max="68" data-min="40">{_text(text)}</div></div></div>'
+
+
+def flash_layer(text: str) -> str:
+    """Hook box plus a small 'details in caption' tag, for 3-second flash Reels."""
+    return (f'<div class="layer"><div class="hookbox"><div class="box heading fit" data-max="72" data-min="44">{_text(text)}</div></div>'
+            '<div class="hint">details in caption &#8595;</div></div>')
 
 
 def scene_layer(text: str, index: int, total: int, handle: str) -> str:

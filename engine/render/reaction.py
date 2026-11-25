@@ -15,6 +15,27 @@ def durations(post: dict, clip_seconds: float) -> list[float]:
     return [hook, *points, 2.6]
 
 
+FLASH_SECONDS = 3.0
+
+
+def render_flash(post: dict, account: dict, clip: dict, music: Path, out: Path) -> Path:
+    """~3-second loop: the reaction clip with the hook and 'details in caption'. Ends on the same face it starts
+    on, so the loop is seamless and people replay it while reading the caption."""
+    secs = min(FLASH_SECONDS, clip["seconds"])
+    png = overlays.render([(overlays.flash_layer(post["hook"]), True)], account, out.parent / "layers")[0]
+    music_start = random.uniform(0, 40)
+    norm = "fps=30,format=yuv420p,setsar=1"
+    f = (f"[0:v]scale=1080:1920,{norm}[r];[r][1:v]overlay=0:0:shortest=1,{norm}[v];"
+         f"[2:a]atrim=0:{secs:.2f},afade=t=in:d=0.15,afade=t=out:st={secs - 0.3:.2f}:d=0.3[a]")
+    subprocess.run(["ffmpeg", "-v", "error", "-y", "-t", f"{secs:.2f}", "-i", str(assets.reaction_path(clip)),
+                    "-loop", "1", "-t", f"{secs:.2f}", "-framerate", str(FPS), "-i", str(png),
+                    "-ss", f"{music_start:.2f}", "-i", str(music), "-filter_complex", f,
+                    "-map", "[v]", "-map", "[a]", "-c:v", "libx264", "-preset", "medium", "-crf", "20",
+                    "-pix_fmt", "yuv420p", "-r", str(FPS), "-c:a", "aac", "-b:a", "128k", "-t", f"{secs:.2f}",
+                    "-movflags", "+faststart", str(out)], check=True)
+    return out
+
+
 def render(post: dict, account: dict, clip: dict, backgrounds: list[dict], music: Path, out: Path,
            site_clip: Path | None = None, link: str | None = None) -> Path:
     """backgrounds: one picked background entry per point. site_clip/link: for promos, a screen capture of the
