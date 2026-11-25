@@ -78,7 +78,7 @@ def check_post(post: dict, fmt: str = "carousel", recent_hooks: list[str] = (),
             _too_long(problems, f"slide {i} title", s["title"], limits["slide_title"])
             _too_long(problems, f"slide {i} body", s["body"], limits["slide_body"])
     elif fmt in ("reaction", "animated"):
-        lo, hi = (3, 5) if fmt == "reaction" else (3, 3)
+        lo, hi = (3, 4) if fmt == "reaction" else (3, 3)
         if not lo <= len(post["points"]) <= hi:
             problems.append(f"needs {lo}-{hi} points, got {len(post['points'])}")
         for i, p in enumerate(post["points"], 1):

@@ -46,9 +46,9 @@ def render(post_row: dict, account: dict) -> tuple[list[Path], dict]:
         return files, {"backgrounds": [bg["file"]]}
 
     if fmt == "reaction":
-        if post.get("avoid_reaction"):  # remixes use a different face than the original winner
-            avoid.add(post["avoid_reaction"])
-        clip = assets.pick_reaction(post["reaction"], avoid=avoid)
+        # Faces are picked by how well they hold viewers (engine/clipstats.py), not rotated: with only 10 clips,
+        # rotation forced weaker faces. Remixes may reuse the winning face.
+        clip = assets.pick_reaction(post["reaction"])
         backgrounds = []
         for point in post["points"]:
             bg = assets.pick_background(point["background"], style, avoid)

@@ -127,7 +127,7 @@ KIND_FORMATS = {
     "breakdown": ("carousel", "reaction", "animated", "myth_fact", "explainer"),
     "india_admin": ("carousel", "reaction", "animated", "checklist", "explainer"),
     "funding_roundup": ("carousel",),
-    "news": ("carousel", "reaction", "animated", "explainer"),
+    "news": ("reaction",),  # 100k focus: reaction Reels only
     "winner": None,
     "promo": ("reaction",),
     "remix": ("reaction",),  # re-make of one of our winners on another account  # own-product promos: the face hook works best, then a live capture of the site

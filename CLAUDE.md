@@ -57,6 +57,12 @@ acc5 foundr_world (Storyteller, real company stories only). Profiles in `config/
   hook, twist, founder lesson, debatable question CTA. Audience is ALWAYS founders, never a general/mass audience. Advice topics weighted to starting_up. Funding roundup off (0 views).
   No "confirm with a CA/lawyer" disclaimers anywhere. Founder questions: Reddit blocks GitHub servers, so the
   scheduler pools Reddit + Ask HN threads hourly on R2 (`pools/reddit.json`) for Sunday's plan.
+- **CURRENT FOCUS (owner, 25 Nov 2026): one Reel at 100k views on any account. Everything else is on hold, not
+  scrapped.** All accounts: reaction Reels only, content = famous-company breakdowns (50-70%) + 'who told you'
+  myth-busts + remixes of winners; India guides, explainers, carousels, promos paused. Hook styles that hold
+  viewers: 'who told you <belief>' (skeptical face) and 'wait <company/you> <shocking fact>??' (shocked face).
+  Reaction Reels prefer 3 points (~12-16s) and a 'send this to...' CTA. Face clips are chosen by live median
+  skip rate (`engine/clipstats.py`), not rotated. Daily report leads with progress to 100k.
 - Winner remixes (`engine/remix.py`, `kind: remix`): each winner from the last 14 days is re-made once on 2 other
   accounts (new hook/wording, same facts, different face clip); they take slots from the winner share; remixes are
   never remixed. `big_swing_account: acc5` gets first pick of breakdown sources (famous names first in the list).

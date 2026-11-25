@@ -48,10 +48,12 @@ FORMAT_GUIDES = {
         "slide body {slide_body}, cta {cta}, caption {caption}."
     ),
     "reaction": (
-        "REACTION REEL (about 15-20 seconds): opens on a person's reaction clip with the hook written over it, "
-        "then 3 to 5 quick text scenes (one punchy line each, read in about 3 seconds), then a short CTA.\n"
+        "REACTION REEL (about 12-16 seconds): opens on a person's reaction clip with the hook written over it, "
+        "then 3 or 4 quick text scenes (one punchy line each, read in about 3 seconds), then a short CTA. "
+        "Prefer 3 points: shorter Reels get watched to the end and replayed, which is what spreads them.\n"
         "The hook must make the reaction make sense: a surprising truth, a costly mistake, a myth, or a great shortcut. "
-        "POV / 'when you realise' / 'nobody tells you' framings work well. Each point stands alone as one line.\n"
+        "Each point stands alone as one line and makes the viewer want the next.\n"
+        "cta: make people send it to someone, e.g. 'send this to the founder who still...' or 'tag your co-founder'.\n"
         "reaction: shocked = surprising truth or costly mistake; excited = great hack, shortcut or win; "
         "skeptical = a myth or bad advice being called out.\n"
         "Each point gets its own background category from the menu.\n"
@@ -118,8 +120,6 @@ HARD RULES
 - No guarantees ("guaranteed", "will get you funded", "100%").
 - No disclaimers telling people to confirm, verify or check with a CA, lawyer, portal or expert. Give the
   practical answer directly (owner's rule).
-- Legal, tax and accounting points are general information; where it matters, tell the reader
-  to confirm with an accountant or lawyer for their country.
 - Do not mention any product or company of ours. No emojis on slides.
 - 3 to 8 hashtags, lowercase, without '#'. Captions add context and end with a question or save prompt.
 
@@ -134,6 +134,13 @@ Good: "wdym it's not necessary to incorporate from day 1??", "wait you DON'T nee
 don't read the deck", "ok who decided networking events were a good idea".
 For reaction Reels the hook must fit the face in the clip: shocked/excited = "wait what / no way / wdym";
 skeptical = "be so serious rn / who told you that".
+WHAT OUR DATA SAYS (16 of our 17 Reels with 1,000+ views had a skip rate under 45%, and these two styles
+dominate them; use one of them for most Reels):
+1. "who told you <a belief founders hold>" with the skeptical face, e.g. "who told you investors sign NDAs
+   before the pitch", "who told you a bigger market means more customers".
+2. "wait <famous company / you> <one shocking, specific fact>??" with the shocked face, e.g. "wait oyo lost
+   almost as much as it earned in one year??", "wait you're paying vendors before customers pay you??".
+The excited face holds viewers worst: use it only for a genuine win or shortcut.
 Never write like an AI or a content template: no "Unpopular opinion:", "Hot take:", "POV:", "Here's why",
 "Let's talk about", "The truth about", "game-changer", "In today's world", no colons dividing the hook, no
 title case, no em dashes. Slides and points stay clear and plain (short sentences, no slang overload).

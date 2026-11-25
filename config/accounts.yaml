@@ -34,8 +34,8 @@ accounts:
     fonts: {heading: "Archivo Black", body: "Inter"}
     background_style: photo   # photo | illustration | any
     format_mix: {reaction: 0.85, carousel: 0.15}
-    format_mix_next: {reaction: 0.95, carousel: 0.05}   # from 15 Nov review: Reels carry results, 2D formats paused
-    content_mix: {breakdown: 0.3, evergreen: 0.3, reddit_qa: 0.3, india_admin: 0.1}   # breakdowns are the best angle as Reels (25 Nov)
+    format_mix_next: {reaction: 1.0}   # 100k focus (25 Nov): only reaction Reels; explainers/carousels on hold
+    content_mix: {breakdown: 0.5, evergreen: 0.35, reddit_qa: 0.15}   # 100k focus: breakdowns + 'who told you' myths; India guides on hold
     post_times: ["07:10", "09:40", "12:20", "15:05", "18:30", "21:15"]
 
   - id: acc2
@@ -48,8 +48,8 @@ accounts:
     fonts: {heading: "Fraunces", body: "Inter"}
     background_style: illustration   # photo | illustration | any
     format_mix: {reaction: 0.85, carousel: 0.15}
-    format_mix_next: {reaction: 0.75, explainer: 0.2, carousel: 0.05}   # from 15 Nov review: Reels carry results, 2D formats paused
-    content_mix: {breakdown: 0.25, evergreen: 0.2, reddit_qa: 0.3, india_admin: 0.25}   # breakdowns are the best angle as Reels (25 Nov)
+    format_mix_next: {reaction: 1.0}   # 100k focus (25 Nov): only reaction Reels; explainers/carousels on hold
+    content_mix: {breakdown: 0.5, evergreen: 0.35, reddit_qa: 0.15}   # 100k focus: breakdowns + 'who told you' myths; India guides on hold
     post_times: ["07:45", "10:15", "13:00", "16:10", "19:05", "21:50"]
 
   - id: acc3
@@ -62,8 +62,8 @@ accounts:
     fonts: {heading: "Space Grotesk", body: "JetBrains Mono"}
     background_style: photo   # photo | illustration | any
     format_mix: {reaction: 0.85, carousel: 0.15}
-    format_mix_next: {reaction: 0.95, carousel: 0.05}   # from 15 Nov review: Reels carry results, 2D formats paused
-    content_mix: {breakdown: 0.25, evergreen: 0.3, india_admin: 0.25, reddit_qa: 0.2}   # breakdowns are the best angle as Reels (25 Nov)
+    format_mix_next: {reaction: 1.0}   # 100k focus (25 Nov): only reaction Reels; explainers/carousels on hold
+    content_mix: {breakdown: 0.5, evergreen: 0.35, reddit_qa: 0.15}   # 100k focus: breakdowns + 'who told you' myths; India guides on hold
     post_times: ["08:05", "10:50", "13:35", "16:40", "19:40", "22:20"]
 
   - id: acc4
@@ -76,8 +76,8 @@ accounts:
     fonts: {heading: "Montserrat", body: "Poppins"}
     background_style: illustration   # photo | illustration | any
     format_mix: {reaction: 0.85, carousel: 0.15}
-    format_mix_next: {reaction: 0.95, carousel: 0.05}   # from 15 Nov review: Reels carry results, 2D formats paused
-    content_mix: {breakdown: 0.3, evergreen: 0.35, reddit_qa: 0.35}   # breakdowns are the best angle as Reels (25 Nov)
+    format_mix_next: {reaction: 1.0}   # 100k focus (25 Nov): only reaction Reels; explainers/carousels on hold
+    content_mix: {breakdown: 0.5, evergreen: 0.35, reddit_qa: 0.15}   # 100k focus: breakdowns + 'who told you' myths; India guides on hold
     post_times: ["07:25", "10:00", "12:45", "15:30", "18:50", "21:35"]
 
   - id: acc5
@@ -90,6 +90,6 @@ accounts:
     fonts: {heading: "DM Serif Display", body: "Inter"}
     background_style: photo   # photo | illustration | any
     format_mix: {reaction: 0.85, carousel: 0.15}
-    format_mix_next: {reaction: 0.95, carousel: 0.05}   # from 15 Nov review: Reels carry results, 2D formats paused
-    content_mix: {breakdown: 0.6, evergreen: 0.2, reddit_qa: 0.2}   # breakdowns are the best angle as Reels (25 Nov)
+    format_mix_next: {reaction: 1.0}   # 100k focus (25 Nov): only reaction Reels; explainers/carousels on hold
+    content_mix: {breakdown: 0.7, evergreen: 0.3}   # 100k focus: breakdowns + 'who told you' myths; India guides on hold
     post_times: ["08:20", "11:05", "14:10", "17:00", "20:00", "22:40"]

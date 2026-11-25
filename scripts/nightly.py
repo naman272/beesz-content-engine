@@ -107,6 +107,9 @@ def daily_report(rows: list[dict]) -> str:
     for p in published:
         counts[p["account_id"]] += 1
     lines = [f"📊 Daily report: {len(published)} posts published, {len(failed)} failed in the last 24h"]
+    best = db.select("hooks", {"source": "eq.winner"}, columns="hook,views", order="views.desc.nullslast", limit=1)
+    if best:  # the one goal for now (owner, 25 Nov 2026): a single Reel at 100k views
+        lines.insert(0, f"🎯 100k goal: best Reel so far {best[0]['views']:,} views ({best[0]['views'] / 1000:.1f}%) · {best[0]['hook'][:50]}")
     lines += [f"  @{HANDLES[acc]}: {n}" for acc, n in sorted(counts.items())]
     if rows:
         top = sorted(rows, key=lambda r: r["views"] or 0, reverse=True)[:3]

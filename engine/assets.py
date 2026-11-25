@@ -69,13 +69,22 @@ def reaction_emotions() -> list[str]:
     return sorted({c["emotion"] for c in _reactions()})
 
 
-def pick_reaction(emotion: str, creator: str | None = None, avoid: set[str] = frozenset()) -> dict:
+# Faces that can stand in for each emotion. The excited clips hold viewers worst, so "excited" posts can also
+# get a shocked face (it reads as "no way, really??"); the weights below then favour the stronger clips.
+COMPATIBLE = {"excited": ("excited", "shocked"), "shocked": ("shocked",), "skeptical": ("skeptical",)}
+
+
+def pick_reaction(emotion: str, creator: str | None = None, avoid: set[str] = frozenset(),
+                  by_performance: bool = True) -> dict:
     clips = _reactions()
-    pool = [c for c in clips if c["emotion"] == emotion] or clips
+    pool = [c for c in clips if c["emotion"] in COMPATIBLE.get(emotion, (emotion,))] or clips
     if creator:
         pool = [c for c in pool if c["creator"] == creator] or pool
     fresh = [c for c in pool if c["file"] not in avoid] or pool
-    return random.choice(fresh)
+    if not by_performance:
+        return random.choice(fresh)
+    from engine import clipstats
+    return random.choices(fresh, weights=clipstats.weights([c["file"] for c in fresh]))[0]
 
 
 def reaction_path(clip: dict) -> Path:
