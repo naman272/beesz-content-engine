@@ -53,8 +53,8 @@ acc5 foundr_world (Storyteller, real company stories only). Profiles in `config/
   gitignored `assets/characters/`). Owner makes more poses/characters in ChatGPT on request. Never use the old mascot.
 - 25 Nov 2026 (owner): goal is 50k-100k-view Reels. Company breakdowns as Reels are the best angle (median 170,
   4 of top 5 ever), so they're back on every account (foundr_world 60%); "big swing" track = household-name Indian
-  brands first in `config/sources.yaml` + mass-audience breakdown guide (shocking checkable fact in the hook,
-  twist, lesson, debatable question CTA). Advice topics weighted to starting_up. Funding roundup off (0 views).
+  brands first in `config/sources.yaml`; breakdown guide: shocking checkable fact about a founder decision in the
+  hook, twist, founder lesson, debatable question CTA. Audience is ALWAYS founders, never a general/mass audience. Advice topics weighted to starting_up. Funding roundup off (0 views).
   No "confirm with a CA/lawyer" disclaimers anywhere. Founder questions: Reddit blocks GitHub servers, so the
   scheduler pools Reddit + Ask HN threads hourly on R2 (`pools/reddit.json`) for Sunday's plan.
 - Own-product promos (`config/promos.yaml`, `engine/promos.py`): `kind: promo`, always reaction Reels with a live

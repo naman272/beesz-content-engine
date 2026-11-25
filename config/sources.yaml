@@ -13,7 +13,7 @@ breakdowns:
   min_chars: 2500
   reuse_after_days: 30   # the same company can come back with a different lesson
   companies:
-    # Household names first (big-swing track, 25 Nov): stories everyone in India knows reach far beyond founders
+    # Well-known names first (big-swing track, 25 Nov): famous companies, always told as a founder lesson
     - {name: "Wipro", url: "https://en.wikipedia.org/wiki/Wipro"}
     - {name: "Kingfisher Airlines", url: "https://en.wikipedia.org/wiki/Kingfisher_Airlines"}
     - {name: "Jet Airways", url: "https://en.wikipedia.org/wiki/Jet_Airways"}

@@ -231,9 +231,9 @@ def breakdowns(count: int) -> list[dict]:
             "index": {"type": "integer"}, "company": {"type": "string"}})}})
         picks = _fast_json(
             "Pick the stories that are about ONE specific company's journey, decision, pivot, growth or failure, "
-            "with a lesson early-stage founders can learn from, AND where the company is widely known to ordinary "
-            "people in India (a household brand, a famous startup or a big global name) or the story is unusually "
-            "dramatic (a collapse, scandal, huge loss, shock exit). Skip small startups most people haven't heard of, "
+            "with a clear lesson early-stage founders can use, AND where the company is one most Indian founders "
+            "would recognise (a well-known startup or brand, or a big global name) or the story is unusually "
+            "dramatic (a collapse, scandal, huge loss, shock exit). Skip small startups few founders have heard of, "
             "generic market news, interviews about investing, and roundups.\n\n" + listing, schema)["picks"]
         for p in picks:
             if len(docs) >= count or not 0 <= p["index"] < len(news):

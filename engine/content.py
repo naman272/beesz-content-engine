@@ -301,15 +301,17 @@ SOURCED_GUIDES = {
     ),
     "breakdown": (
         "REAL COMPANY BREAKDOWN: {label}. Use ONLY the source below for names, numbers, dates and events; "
-        "never invent quotes, figures or events. This is written for a MASS audience (anyone in India who knows "
-        "the brand), not just founders: our biggest Reels were 'wait oyo lost almost as much as it earned in one "
-        "year??' and 'wait ola tried food delivery TWICE and shut it both times??'.\n"
-        "Hook: name the company + the single most jaw-dropping, checkable fact from the source (a number, a "
+        "never invent quotes, figures or events. The audience is early-stage founders (mostly India): tell the "
+        "story through the founder DECISION behind it (pricing, distribution, fundraising, hiring, product, "
+        "pivots, cash) so a founder learns something they can use. Our biggest Reels were 'wait oyo lost almost "
+        "as much as it earned in one year??' and 'wait ola tried food delivery TWICE and shut it both times??'.\n"
+        "Hook: name the company + the most jaw-dropping, checkable fact about that decision (a number, a "
         "reversal, an unlikely origin, a failure), reacting like a real person. Never a vague teaser.\n"
-        "Points (3-4), each one makes the viewer need the next: the surprising setup -> what actually happened "
-        "(with the real number) -> the twist -> the one lesson founders can steal. No filler, no 'let's dive in'.\n"
-        "CTA: a short debatable question people want to answer or send to a friend (e.g. 'would you have shut it "
-        "down?'). Caption: 2-3 lines expanding the story, then the question, then 'Source: {source_name}'.\n\nSOURCE:\n{source}"
+        "Points (3-4), each one makes the viewer need the next: the surprising setup -> what they decided and what "
+        "happened (with the real number) -> the twist -> the one lesson founders can steal. No filler.\n"
+        "CTA: a short debatable founder question people want to answer or send to their co-founder (e.g. 'would "
+        "you have shut it down?'). Caption: 2-3 lines on the decision and lesson, then the question, then "
+        "'Source: {source_name}'.\n\nSOURCE:\n{source}"
     ),
     "india_admin": (
         "INDIA STARTUP GUIDE: {label}. Use ONLY the sources below; names and figures (amounts, %, limits, dates, "
