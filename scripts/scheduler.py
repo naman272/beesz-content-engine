@@ -21,6 +21,8 @@ TASKS = [
     # Breaking news is due immediately; the main render pass covers everything due in the next 8 hours
     ("render", ["python", "-m", "scripts.render_due", "--hours", "8"], 60, 60),
     ("inbox", ["python", "-m", "scripts.telegram_inbox"], 180, 20),
+    # Reddit blocks GitHub servers part of the time: gather a few subreddits an hour into a pool for Sunday
+    ("reddit", ["python", "-c", "from engine import sources; sources.collect_reddit()"], 60, 10),
 ]
 
 

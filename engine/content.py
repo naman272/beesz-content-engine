@@ -116,6 +116,8 @@ HARD RULES
 - NEVER invent stories, people, founders, companies, case studies, quotes or testimonials. No "Imagine Maya..."
   characters. Real stories only come from provided sources. Keep advice concrete: steps, scripts, checklists.
 - No guarantees ("guaranteed", "will get you funded", "100%").
+- No disclaimers telling people to confirm, verify or check with a CA, lawyer, portal or expert. Give the
+  practical answer directly (owner's rule).
 - Legal, tax and accounting points are general information; where it matters, tell the reader
   to confirm with an accountant or lawyer for their country.
 - Do not mention any product or company of ours. No emojis on slides.
@@ -291,17 +293,23 @@ def request_params(model: str, account: dict, topic: str, count: int, fmt: str =
 
 SOURCED_GUIDES = {
     "reddit_qa": (
-        "FOUNDER QUESTION. A real founder asked this on r/{sub} this week:\n{source}\n\n"
+        "FOUNDER QUESTION. A real founder asked this on {where} this week:\n{source}\n\n"
         "Write a post that answers it for everyone with the same problem. The hook is a controversial take on the "
         "question (e.g. 'wait you don't even need a co-founder??'), backed up by the answer. Don't quote the person or mention usernames. "
         "Give concrete, practical steps. Specific names and numbers only if they appear in the question. "
-        "In the caption, say it came from a founder question on Reddit (r/{sub})."
+        "In the caption, say it came from a founder question on {where}."
     ),
     "breakdown": (
         "REAL COMPANY BREAKDOWN: {label}. Use ONLY the source below for names, numbers, dates and events; "
-        "never invent quotes, figures or events. Structure: hook on the most surprising decision or turn -> "
-        "what they did -> the turning point -> 2-3 lessons early-stage founders can copy. "
-        "Hook: a provocative take on the story (e.g. 'they had the better product and STILL lost??'). Credit the source in the caption ('Source: {source_name}').\n\nSOURCE:\n{source}"
+        "never invent quotes, figures or events. This is written for a MASS audience (anyone in India who knows "
+        "the brand), not just founders: our biggest Reels were 'wait oyo lost almost as much as it earned in one "
+        "year??' and 'wait ola tried food delivery TWICE and shut it both times??'.\n"
+        "Hook: name the company + the single most jaw-dropping, checkable fact from the source (a number, a "
+        "reversal, an unlikely origin, a failure), reacting like a real person. Never a vague teaser.\n"
+        "Points (3-4), each one makes the viewer need the next: the surprising setup -> what actually happened "
+        "(with the real number) -> the twist -> the one lesson founders can steal. No filler, no 'let's dive in'.\n"
+        "CTA: a short debatable question people want to answer or send to a friend (e.g. 'would you have shut it "
+        "down?'). Caption: 2-3 lines expanding the story, then the question, then 'Source: {source_name}'.\n\nSOURCE:\n{source}"
     ),
     "india_admin": (
         "INDIA STARTUP GUIDE: {label}. Use ONLY the sources below; names and figures (amounts, %, limits, dates, "
@@ -342,7 +350,8 @@ def sourced_params(model: str, account: dict, fmt: str, doc: dict, fix_notes: st
     task = f"Write 1 {label}. Pick the topic that fits best.\n" + SOURCED_GUIDES[doc["kind"]].format(
         source=source, label=doc.get("label", ""), sub=doc.get("sub", ""),
         source_name=doc.get("source_name", ""), official=doc.get("official", "the official portal"),
-        angle=doc.get("angle", ""), url=doc.get("url", ""))
+        angle=doc.get("angle", ""), url=doc.get("url", ""),
+        where=doc.get("where") or f"Reddit (r/{doc.get('sub', '')})")
     if doc.get("previous_hooks"):
         task += ("\n\nWe already posted about this before. Take a clearly DIFFERENT angle and lesson than these:\n"
                  + "\n".join(f"- {h}" for h in doc["previous_hooks"]))

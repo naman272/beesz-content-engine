@@ -2,7 +2,7 @@
 
 # 1. Founder questions: top posts of the week from these subreddits (RSS).
 reddit:
-  subreddits: [smallbusiness, SideProject, AI_Agents, ChatGPT, automation, ProductivityApps, nocode,
+  subreddits: [smallbusiness, SideProject, AI_Agents, ChatGPT, automation, ProductivityApps,
                Entrepreneur, startups, indiehackers, indianstartups, ArtificialInteligence, productivity,
                EntrepreneurRideAlong, Startup_Ideas, growmybusiness, micro_saas, StartUpIndia]
   min_score: 7          # 1-10: genuine, relatable founder question we can answer well
@@ -13,6 +13,43 @@ breakdowns:
   min_chars: 2500
   reuse_after_days: 30   # the same company can come back with a different lesson
   companies:
+    # Household names first (big-swing track, 25 Nov): stories everyone in India knows reach far beyond founders
+    - {name: "Wipro", url: "https://en.wikipedia.org/wiki/Wipro"}
+    - {name: "Kingfisher Airlines", url: "https://en.wikipedia.org/wiki/Kingfisher_Airlines"}
+    - {name: "Jet Airways", url: "https://en.wikipedia.org/wiki/Jet_Airways"}
+    - {name: "Reliance Jio", url: "https://en.wikipedia.org/wiki/Jio"}
+    - {name: "Nirma", url: "https://en.wikipedia.org/wiki/Nirma"}
+    - {name: "Maggi", url: "https://en.wikipedia.org/wiki/Maggi"}
+    - {name: "Amul", url: "https://en.wikipedia.org/wiki/Amul"}
+    - {name: "Haldiram's", url: "https://en.wikipedia.org/wiki/Haldiram's"}
+    - {name: "Patanjali Ayurved", url: "https://en.wikipedia.org/wiki/Patanjali_Ayurved"}
+    - {name: "Blinkit", url: "https://en.wikipedia.org/wiki/Blinkit"}
+    - {name: "Bisleri", url: "https://en.wikipedia.org/wiki/Bisleri"}
+    - {name: "Parle Products", url: "https://en.wikipedia.org/wiki/Parle_Products"}
+    - {name: "Tata Nano", url: "https://en.wikipedia.org/wiki/Tata_Nano"}
+    - {name: "IndiGo", url: "https://en.wikipedia.org/wiki/IndiGo"}
+    - {name: "Royal Enfield", url: "https://en.wikipedia.org/wiki/Royal_Enfield"}
+    - {name: "Titan Company", url: "https://en.wikipedia.org/wiki/Titan_Company"}
+    - {name: "Asian Paints", url: "https://en.wikipedia.org/wiki/Asian_Paints"}
+    - {name: "Infosys", url: "https://en.wikipedia.org/wiki/Infosys"}
+    - {name: "Hero MotoCorp", url: "https://en.wikipedia.org/wiki/Hero_MotoCorp"}
+    - {name: "Bajaj Auto", url: "https://en.wikipedia.org/wiki/Bajaj_Auto"}
+    - {name: "Ola Electric", url: "https://en.wikipedia.org/wiki/Ola_Electric"}
+    - {name: "BluSmart", url: "https://en.wikipedia.org/wiki/BluSmart"}
+    - {name: "Snapdeal", url: "https://en.wikipedia.org/wiki/Snapdeal"}
+    - {name: "Housing.com", url: "https://en.wikipedia.org/wiki/Housing.com"}
+    - {name: "Myntra", url: "https://en.wikipedia.org/wiki/Myntra"}
+    - {name: "MakeMyTrip", url: "https://en.wikipedia.org/wiki/MakeMyTrip"}
+    - {name: "Naukri.com", url: "https://en.wikipedia.org/wiki/Naukri.com"}
+    - {name: "Lijjat Papad", url: "https://en.wikipedia.org/wiki/Shri_Mahila_Griha_Udyog_Lijjat_Papad"}
+    - {name: "Dabur", url: "https://en.wikipedia.org/wiki/Dabur"}
+    - {name: "Nokia", url: "https://en.wikipedia.org/wiki/Nokia"}
+    - {name: "BlackBerry", url: "https://en.wikipedia.org/wiki/BlackBerry_Limited"}
+    - {name: "Kodak", url: "https://en.wikipedia.org/wiki/Kodak"}
+    - {name: "Blockbuster", url: "https://en.wikipedia.org/wiki/Blockbuster_LLC"}
+    - {name: "Yahoo", url: "https://en.wikipedia.org/wiki/Yahoo"}
+    - {name: "FTX", url: "https://en.wikipedia.org/wiki/FTX"}
+    # Founder classics
     - {name: Zerodha, url: "https://en.wikipedia.org/wiki/Zerodha"}
     - {name: Zomato, url: "https://en.wikipedia.org/wiki/Zomato"}
     - {name: Flipkart, url: "https://en.wikipedia.org/wiki/Flipkart"}
@@ -179,6 +216,7 @@ india_admin:
 
 # 5. Weekly funding roundup from the news feeds' headlines (posted once a week).
 funding_roundup:
+  enabled: false       # 0 views as carousels; dropped 25 Nov 2026
   account: acc3
   weekday: 0            # Monday
   min_rounds: 4

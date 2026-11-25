@@ -190,7 +190,8 @@ def build_week(cfg: dict, start: date, only_slots: dict[str, list[datetime]] | N
             kinds = [force_kind] * n
         rows = [[account["id"], slot, fmt, topic, kind]
                 for slot, (fmt, topic), kind in zip(account_slots, assign(cfg, account, account_slots), kinds)]
-        if account["id"] == roundup_cfg["account"] and rows and only_slots is None:  # refills never add a roundup
+        if (roundup_cfg.get("enabled", True) and account["id"] == roundup_cfg["account"] and rows
+                and only_slots is None):  # refills never add a roundup
             day = [r for r in rows if r[1].astimezone(tz).weekday() == roundup_cfg["weekday"]]
             (day or rows)[0][4] = "funding_roundup"
         planned += rows

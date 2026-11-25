@@ -74,18 +74,19 @@ def _fast_json(prompt: str, schema: dict, attempts: int = 3) -> dict:
 
 # ---------- 1. Founder questions from Reddit ----------
 
-def _reddit_feed(sub: str) -> list:
+def _reddit_feed(sub: str, tries: int = 4, timeout: int = 30) -> list:
     url = f"https://www.reddit.com/r/{sub}/top/.rss?t=week"
     status = None
-    for _ in range(4):  # Reddit rate-limits cloud servers and sometimes hangs; back off and retry
+    for attempt in range(tries):  # Reddit rate-limits cloud servers and sometimes hangs; back off and retry
         try:
-            r = requests.get(url, headers=REDDIT_UA, timeout=30)
+            r = requests.get(url, headers=REDDIT_UA, timeout=timeout)
             status = r.status_code
             if r.status_code == 200:
                 return feedparser.parse(r.content).entries
         except requests.RequestException as e:  # one slow subreddit must not sink the whole plan
             status = type(e).__name__
-        time.sleep(30)
+        if attempt < tries - 1:
+            time.sleep(30)
     print(f"reddit r/{sub}: gave up ({status})")
     return []
 
@@ -96,15 +97,80 @@ def _strip_html(value: str) -> str:
     return re.sub(r"\s+", " ", text).strip()
 
 
+# Reddit blocks GitHub's servers part of the time, so threads are collected a few subreddits per hour all week
+# (scripts.scheduler -> collect_reddit) into a pool on R2; the Sunday plan reads the pool plus one quick live pass.
+REDDIT_POOL = "pools/reddit.json"
+POOL_DAYS = 10
+
+
+def _reddit_threads(sub: str, min_chars: int, **kw) -> list[dict]:
+    out = []
+    for e in _reddit_feed(sub, **kw):
+        body = _strip_html((e.get("content") or [{}])[0].get("value", ""))
+        if e.get("link") and len(e.get("title", "")) + len(body) >= min_chars:
+            out.append({"sub": sub, "url": e["link"], "title": e.get("title", ""), "body": body[:3000], "at": time.time()})
+    return out
+
+
+def _load_pool() -> list[dict]:
+    from engine import storage
+    try:
+        pool = json.loads(storage.download(REDDIT_POOL, attempts=2))
+    except Exception:
+        return []
+    return [p for p in pool if p.get("at", 0) >= time.time() - POOL_DAYS * 86400]
+
+
+def _ask_hn(min_chars: int) -> list[dict]:
+    """Ask HN questions from the last week (Hacker News's API doesn't block servers, unlike Reddit)."""
+    try:
+        r = requests.get("https://hn.algolia.com/api/v1/search_by_date", timeout=20, params={
+            "tags": "ask_hn", "hitsPerPage": 100,
+            "numericFilters": f"created_at_i>{int(time.time()) - 7 * 86400},points>5"})
+        hits = r.json()["hits"]
+    except Exception as e:
+        print(f"ask hn: failed ({type(e).__name__})")
+        return []
+    out = []
+    for h in hits:
+        body = _strip_html(h.get("story_text") or "")
+        if len(h.get("title") or "") + len(body) >= min_chars:
+            out.append({"sub": "Ask HN", "url": f"https://news.ycombinator.com/item?id={h['objectID']}",
+                        "title": h["title"], "body": body[:3000], "at": time.time()})
+    return out
+
+
+def collect_reddit(per_run: int = 3) -> int:
+    """Adds this hour's few subreddits to the pool (one quick try each). Returns threads added."""
+    from engine import storage
+    cfg = settings()["reddit"]
+    subs = cfg["subreddits"]
+    hour = int(time.time() // 3600)
+    picks = [subs[(hour * per_run + i) % len(subs)] for i in range(per_run)]
+    pool = _load_pool()
+    seen = {p["url"] for p in pool}
+    added = 0
+    found = [t for sub in picks for t in _reddit_threads(sub, cfg["min_chars"], tries=1, timeout=20)]
+    found += _ask_hn(cfg["min_chars"])
+    for t in found:
+        if True:
+            if t["url"] not in seen:
+                pool.append(t)
+                seen.add(t["url"])
+                added += 1
+    storage.upload_bytes(REDDIT_POOL, json.dumps(pool).encode(), "application/json")
+    print(f"reddit pool: +{added} from {', '.join(picks)} ({len(pool)} threads)")
+    return added
+
+
 def reddit_questions(count: int) -> list[dict]:
     cfg = settings()["reddit"]
-    posts = []
-    for sub in cfg["subreddits"]:
-        for e in _reddit_feed(sub):
-            body = _strip_html((e.get("content") or [{}])[0].get("value", ""))
-            if e.get("link") and len(e.get("title", "")) + len(body) >= cfg["min_chars"]:
-                posts.append({"sub": sub, "url": e["link"], "title": e.get("title", ""), "body": body[:3000]})
-        time.sleep(8)
+    posts = _load_pool()
+    seen = {p["url"] for p in posts}
+    print(f"reddit pool: {len(posts)} threads")
+    for sub in cfg["subreddits"]:  # one quick live pass on top, without long back-offs
+        posts += [t for t in _reddit_threads(sub, cfg["min_chars"], tries=1, timeout=15) if t["url"] not in seen]
+        time.sleep(3)
     if not posts:
         return []
     known = set()
@@ -121,7 +187,7 @@ def reddit_questions(count: int) -> list[dict]:
     scored = []
     for start in range(0, len(posts), 60):
         chunk = posts[start:start + 60]
-        listing = "\n".join(f"[{i}] r/{p['sub']}: {p['title']} :: {p['body'][:400]}" for i, p in enumerate(chunk))
+        listing = "\n".join(f"[{i}] {p['sub']}: {p['title']} :: {p['body'][:400]}" for i, p in enumerate(chunk))
         result = _fast_json(
             "These are this week's top Reddit threads. Score each 1-10: is it a GENUINE question or problem that "
             "many early-stage founders or small business owners share, which we can answer with solid, practical "
@@ -136,12 +202,13 @@ def reddit_questions(count: int) -> list[dict]:
             if 0 <= t["index"] < len(chunk):
                 scored.append({**chunk[t["index"]], **t})
     if scored:
-        db.upsert("news_items", [{"url": s["url"], "source": f"r/{s['sub']}", "title": s["title"][:500],
+        db.upsert("news_items", [{"url": s["url"], "source": "Ask HN" if s["sub"] == "Ask HN" else f"r/{s['sub']}", "title": s["title"][:500],
                                   "score": s["score"], "takeaway": s["question"], "reason": s["reason"]}
                                  for s in scored], on_conflict="url")
     best = sorted((s for s in scored if s["score"] >= cfg["min_score"]), key=lambda s: -s["score"])
     return [{
         "kind": "reddit_qa", "label": s["question"], "sub": s["sub"], "source_url": s["url"],
+        "where": "Hacker News (Ask HN)" if s["sub"] == "Ask HN" else f"Reddit (r/{s['sub']})",
         "urls": [s["url"]], "texts": [f"{s['title']}\n{s['body']}"],
     } for s in best[:count]]
 
@@ -164,8 +231,10 @@ def breakdowns(count: int) -> list[dict]:
             "index": {"type": "integer"}, "company": {"type": "string"}})}})
         picks = _fast_json(
             "Pick the stories that are about ONE specific company's journey, decision, pivot, growth or failure, "
-            "with a lesson early-stage founders can learn from. Skip generic market news, interviews about "
-            "investing, and roundups.\n\n" + listing, schema)["picks"]
+            "with a lesson early-stage founders can learn from, AND where the company is widely known to ordinary "
+            "people in India (a household brand, a famous startup or a big global name) or the story is unusually "
+            "dramatic (a collapse, scandal, huge loss, shock exit). Skip small startups most people haven't heard of, "
+            "generic market news, interviews about investing, and roundups.\n\n" + listing, schema)["picks"]
         for p in picks:
             if len(docs) >= count or not 0 <= p["index"] < len(news):
                 continue
