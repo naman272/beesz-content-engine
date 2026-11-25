@@ -20,6 +20,7 @@ ramp: [2, 4]             # posts/day in week 1 and week 2 after launch, then pos
 
 # Formats the engine can render today. Others in format_mix wait until they're built.
 ready_formats: [carousel, reaction, chat, myth_fact, checklist, animated, explainer]
+big_swing_account: acc5      # most reach: gets first pick of the famous-company stories each week
 format_switch_date: 2026-11-04   # slots on/after this date use format_mix_next (end of the hook test)
 
 accounts:

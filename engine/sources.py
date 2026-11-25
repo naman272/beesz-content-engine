@@ -265,14 +265,16 @@ def breakdowns(count: int) -> list[dict]:
 
 def india_topics(count: int) -> list[dict]:
     cfg = settings()["india_admin"]
-    used = _used_source_urls(cfg["reuse_after_days"])
+    # Unused topics first, then the least recently covered (each at most once per plan; repeats get the earlier
+    # hooks so they take a different angle)
+    last_used = {}
+    for r in db.select("posts", {"source_url": "like.topic:*"}, columns="source_url,created_at"):
+        last_used[r["source_url"]] = max(last_used.get(r["source_url"], ""), r["created_at"])
     docs = []
-    for topic in cfg["topics"]:
+    for topic in sorted(cfg["topics"], key=lambda t: last_used.get(f"topic:{t['id']}", "")):
         if len(docs) >= count:
             break
         marker = f"topic:{topic['id']}"
-        if marker in used:
-            continue
         texts, urls = [], []
         for url in topic["sources"]:
             text = fetch_text(url)

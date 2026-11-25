@@ -69,6 +69,8 @@ def collect(client, row: dict, cfg: dict) -> str:
             doc = group.get("doc") or {}
             if doc.get("kind") == "breakdown":
                 post["source_name"] = doc.get("source_name")
+            if doc.get("kind") == "remix":  # use a different face than the original
+                post["avoid_reaction"] = doc.get("avoid_reaction")
             rows.append({
                 "kind": group.get("kind", "evergreen"), "source_url": doc.get("source_url") or doc.get("url"),
                 "account_id": group["account"], "format": group["format"], "topic": post["topic"],

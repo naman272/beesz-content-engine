@@ -57,6 +57,10 @@ acc5 foundr_world (Storyteller, real company stories only). Profiles in `config/
   hook, twist, founder lesson, debatable question CTA. Audience is ALWAYS founders, never a general/mass audience. Advice topics weighted to starting_up. Funding roundup off (0 views).
   No "confirm with a CA/lawyer" disclaimers anywhere. Founder questions: Reddit blocks GitHub servers, so the
   scheduler pools Reddit + Ask HN threads hourly on R2 (`pools/reddit.json`) for Sunday's plan.
+- Winner remixes (`engine/remix.py`, `kind: remix`): each winner from the last 14 days is re-made once on 2 other
+  accounts (new hook/wording, same facts, different face clip); they take slots from the winner share; remixes are
+  never remixed. `big_swing_account: acc5` gets first pick of breakdown sources (famous names first in the list).
+  Breakdowns and India guides reuse the least recently covered source when all were used (with earlier hooks).
 - Own-product promos (`config/promos.yaml`, `engine/promos.py`): `kind: promo`, always reaction Reels with a live
   screen capture of the site (`engine/render/site.py`) and a link-in-bio card. Each active promo takes `share`
   (10%) of the weekly plan; facts only from its brief; promos never become winners. Bio links point to the

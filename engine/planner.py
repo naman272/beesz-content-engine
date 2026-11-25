@@ -7,7 +7,7 @@ from zoneinfo import ZoneInfo
 
 import anthropic
 
-from engine import content, db, llm, promos
+from engine import content, db, llm, promos, remix
 from engine.config import env
 
 
@@ -118,7 +118,7 @@ def plan_angles(topic_counts: Counter, avoid: list[str]) -> dict[str, list[str]]
     return angles
 
 
-SOURCED_KINDS = ("reddit_qa", "breakdown", "india_admin", "funding_roundup", "promo")
+SOURCED_KINDS = ("reddit_qa", "breakdown", "india_admin", "funding_roundup", "promo", "remix")
 CAROUSEL_ONLY = ("funding_roundup",)  # one round per slide reads best as a carousel
 # Formats that suit each post type (a company breakdown doesn't work as a fake DM chat, etc.)
 KIND_FORMATS = {
@@ -129,7 +129,8 @@ KIND_FORMATS = {
     "funding_roundup": ("carousel",),
     "news": ("carousel", "reaction", "animated", "explainer"),
     "winner": None,
-    "promo": ("reaction",),  # own-product promos: the face hook works best, then a live capture of the site
+    "promo": ("reaction",),
+    "remix": ("reaction",),  # re-make of one of our winners on another account  # own-product promos: the face hook works best, then a live capture of the site
 }
 
 
@@ -173,6 +174,9 @@ def build_week(cfg: dict, start: date, only_slots: dict[str, list[datetime]] | N
     promo = promos.active(start)
 
     top_winners = winners()
+    # Winner remixes (whole-week plans only): each recent hit gets re-made on 2 other accounts
+    remix_for = (remix.assign([a["id"] for a in cfg["accounts"]], remix.candidates())
+                 if only_slots is None and not force_kind else {})
     planned = []  # [account_id, slot, format, topic, kind]
     for account in cfg["accounts"]:
         account_slots = slots(cfg, account, start, days) if only_slots is None else only_slots.get(account["id"], [])
@@ -183,7 +187,8 @@ def build_week(cfg: dict, start: date, only_slots: dict[str, list[datetime]] | N
         n_win = round(n * cfg.get("exploit_share", 0)) if n and top_winners else 0
         # Own-product promo takes its share first (whole weeks only; refills keep what's already planned)
         n_promo = round(n * promo["share"]) if promo and n and only_slots is None else 0
-        kinds = (["promo"] * n_promo + ["winner"] * n_win
+        n_remix = min(len(remix_for.get(account["id"], [])), n_win)
+        kinds = (["promo"] * n_promo + ["remix"] * n_remix + ["winner"] * (n_win - n_remix)
                  + (_allocate(account.get("content_mix") or {"evergreen": 1}, n - n_win - n_promo) if n else []))
         random.shuffle(kinds)
         if force_kind:
@@ -197,12 +202,16 @@ def build_week(cfg: dict, start: date, only_slots: dict[str, list[datetime]] | N
         planned += rows
 
     # Gather real sources; slots we can't source fall back to evergreen
-    wanted = Counter(r[4] for r in planned if r[4] in SOURCED_KINDS)
+    wanted = Counter(r[4] for r in planned if r[4] in SOURCED_KINDS and r[4] != "remix")
     docs = {kind: _fetch_docs(kind, count, start) for kind, count in wanted.items()}
     accounts = {a["id"]: a for a in cfg["accounts"]}
-    for r in sorted(planned, key=lambda r: r[1]):
+    # The big-swing account (most reach) gets first pick of sources, so the famous-company stories land there
+    big = cfg.get("big_swing_account")
+    for r in sorted(planned, key=lambda r: (r[0] != big, r[1])):
         r[2] = fit_format(accounts[r[0]], r[4], r[2], cfg["ready_formats"])
-        if r[4] in SOURCED_KINDS:
+        if r[4] == "remix":
+            r.append(remix_for[r[0]].pop(0))
+        elif r[4] in SOURCED_KINDS:
             r.append(docs[r[4]].pop(0) if docs[r[4]] else None)
             if r[5] is None:
                 r[4] = "evergreen"

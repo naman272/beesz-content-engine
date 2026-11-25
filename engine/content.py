@@ -327,6 +327,12 @@ SOURCED_GUIDES = {
         "Use ONLY facts in the headlines; never add investors or details they don't state. "
         "Put \"sources\" in facts_used.\n\nHEADLINES:\n{source}"
     ),
+    "remix": (
+        "REMIX OF ONE OF OUR WINNING REELS ({views} views on another of our accounts). Make a fresh version for "
+        "this account: the same story or insight and the same facts, but a NEW hook (different words, same "
+        "tension) and newly worded points, in this account's voice. Use ONLY facts and numbers that appear in "
+        "the original below; add nothing new. Never mention it was posted elsewhere.\n\nORIGINAL:\n{source}"
+    ),
     "promo": (
         "PROMO FOR OUR OWN FREE TOOL: {label}. This post promotes it openly; it's ours (built by Beesz), so no fake "
         "testimonials, no invented users, results or numbers. Use ONLY the facts below. ANGLE: {angle}.\n"
@@ -352,7 +358,7 @@ def sourced_params(model: str, account: dict, fmt: str, doc: dict, fix_notes: st
     task = f"Write 1 {label}. Pick the topic that fits best.\n" + SOURCED_GUIDES[doc["kind"]].format(
         source=source, label=doc.get("label", ""), sub=doc.get("sub", ""),
         source_name=doc.get("source_name", ""), official=doc.get("official", "the official portal"),
-        angle=doc.get("angle", ""), url=doc.get("url", ""),
+        angle=doc.get("angle", ""), url=doc.get("url", ""), views=doc.get("views", ""),
         where=doc.get("where") or f"Reddit (r/{doc.get('sub', '')})")
     if doc.get("previous_hooks"):
         task += ("\n\nWe already posted about this before. Take a clearly DIFFERENT angle and lesson than these:\n"
